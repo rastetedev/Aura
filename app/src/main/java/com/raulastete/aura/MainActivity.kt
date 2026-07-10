@@ -4,7 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.raulastete.aura.ui.theme.AuraTheme
+import com.raulastete.aura.core.presentation.designsystem.buttons.PrimaryButton
+import com.raulastete.aura.core.presentation.designsystem.theme.AuraTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -12,7 +13,10 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             AuraTheme {
-
+                PrimaryButton(
+                    text = "Test",
+                    onClick = {}
+                )
             }
         }
     }
