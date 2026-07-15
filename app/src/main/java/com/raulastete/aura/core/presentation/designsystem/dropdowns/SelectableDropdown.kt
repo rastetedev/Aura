@@ -38,12 +38,13 @@ import com.raulastete.aura.core.presentation.designsystem.theme.AuraTheme
 @Composable
 fun <T> SelectableDropdown(
     items: List<Selectable<T>>,
-    itemDisplayText: (T) -> String,
+    textForItem: (T) -> String,
     itemKey: (T) -> Any,
-    onDismiss: () -> Unit,
     onItemClick: (Selectable<T>) -> Unit,
+    onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
-    leadingIcon: @Composable (() -> Unit)? = null,
+    noItemsText: String? = null,
+    leadingIcon: @Composable ((T) -> Unit)? = null,
     dropdownOffset: IntOffset = IntOffset.Zero,
     maxDropdownHeight: Dp = Dp.Unspecified,
     extraDropdownOption: ExtraDropdownOption? = null
@@ -67,6 +68,18 @@ fun <T> SelectableDropdown(
                     .padding(6.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
+                item {
+                    if (items.isEmpty() && noItemsText != null) {
+                        Text(
+                            text = noItemsText,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(MaterialTheme.colorScheme.surface)
+                                .padding(8.dp)
+                        )
+                    }
+                }
                 items(items, key = { itemKey(it.item) }) { selectable ->
 
                     val itemContainerColor = animateColorAsState(
@@ -87,9 +100,9 @@ fun <T> SelectableDropdown(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        leadingIcon?.invoke()
+                        leadingIcon?.invoke(selectable.item)
                         Text(
-                            text = itemDisplayText(selectable.item),
+                            text = textForItem(selectable.item),
                             modifier = Modifier.weight(1f)
                         )
                         if (selectable.selected) {
@@ -146,7 +159,7 @@ private fun SelectableDropdownPreview() {
         SelectableDropdown(
             items = (1..5).map { "Option number $it" }.asUnselectedItems()
                 .map { if (it.item == "Option number 3") it.copy(selected = true) else it },
-            itemDisplayText = { it },
+            textForItem = { it },
             itemKey = { it },
             onDismiss = {},
             onItemClick = {},

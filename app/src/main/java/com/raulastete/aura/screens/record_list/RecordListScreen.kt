@@ -3,6 +3,7 @@ package com.raulastete.aura.screens.record_list
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
@@ -23,11 +24,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.raulastete.aura.R
 import com.raulastete.aura.core.presentation.designsystem.theme.AuraTheme
 import com.raulastete.aura.core.presentation.designsystem.theme.bgGradient
+import com.raulastete.aura.screens.record_list.components.FiltersSection
 import com.raulastete.aura.screens.record_list.components.NoRecordsView
 import com.raulastete.aura.screens.record_list.components.RecordFab
 
@@ -98,11 +101,38 @@ fun RecordListContent(
                 }
 
                 state.hasRecords.not() -> {
-                    NoRecordsView(
-                        Modifier
-                            .weight(1f)
-                            .wrapContentSize()
-                            .align(Alignment.CenterHorizontally)
+
+                    Column(Modifier.fillMaxWidth()) {
+                        FiltersSection(
+                            modifier = Modifier.padding(16.dp),
+                            moods = state.moodFilterList,
+                            topics = state.topicFilterList,
+                            moodChipContent = state.moodChipContent,
+                            topicChipContent = state.topicChipContent,
+                            isMoodFilterActive = state.isMoodFilterActive,
+                            isTopicFilterActive = state.isTopicFilterActive,
+                            onAction = onAction,
+                        )
+
+                        NoRecordsView(
+                            Modifier
+                                .weight(1f)
+                                .wrapContentSize()
+                                .align(Alignment.CenterHorizontally)
+                        )
+                    }
+                }
+
+                else -> {
+                    FiltersSection(
+                        modifier = Modifier.padding(16.dp),
+                        moods = state.moodFilterList,
+                        topics = state.topicFilterList,
+                        moodChipContent = state.moodChipContent,
+                        topicChipContent = state.topicChipContent,
+                        isMoodFilterActive = state.isMoodFilterActive,
+                        isTopicFilterActive = state.isTopicFilterActive,
+                        onAction = onAction,
                     )
                 }
             }
