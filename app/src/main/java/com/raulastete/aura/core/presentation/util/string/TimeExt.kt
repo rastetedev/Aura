@@ -1,5 +1,8 @@
 package com.raulastete.aura.core.presentation.util.string
 
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import java.util.Locale
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
@@ -15,4 +18,9 @@ fun Duration.formatMMSS(): String {
         minutes,
         seconds
     )
+}
+
+fun Instant.formatHHmm(): String {
+    val formatter = DateTimeFormatter.ofPattern("HH:mm")
+    return  this.atZone(ZoneId.systemDefault()).format(formatter)
 }

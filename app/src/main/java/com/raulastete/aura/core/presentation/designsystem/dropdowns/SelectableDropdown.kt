@@ -152,6 +152,20 @@ fun <T> SelectableDropdown(
     }
 }
 
+data class ExtraDropdownOption(
+    val text: String,
+    val onClick: () -> Unit
+)
+
+data class Selectable<T>(
+    val item: T,
+    val selected: Boolean
+)
+
+fun <T> List<T>.asUnselectedItems(): List<Selectable<T>> {
+    return map { Selectable(it, false) }
+}
+
 @Preview
 @Composable
 private fun SelectableDropdownPreview() {

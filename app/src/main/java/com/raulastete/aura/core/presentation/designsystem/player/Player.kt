@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import com.raulastete.aura.core.presentation.designsystem.theme.AuraTheme
 import com.raulastete.aura.core.presentation.model.MoodUi
 import com.raulastete.aura.core.presentation.model.PlaybackState
+import com.raulastete.aura.core.presentation.model.TrackSizeInfo
 import com.raulastete.aura.core.presentation.util.string.formatMMSS
 import kotlin.random.Random
 import kotlin.time.Duration
@@ -35,6 +36,7 @@ fun Player(
     totalPlaybackDuration : Duration,
     onPlayClick: () -> Unit,
     onPauseClick: () -> Unit,
+    onTrackSizeAvailable: (TrackSizeInfo) -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -97,7 +99,8 @@ private fun PlayerPreview() {
             onPlayClick = {},
             onPauseClick = {},
             durationPlayed = 125.seconds,
-            totalPlaybackDuration = 250.seconds
+            totalPlaybackDuration = 250.seconds,
+            onTrackSizeAvailable = {}
         )
     }
 }
