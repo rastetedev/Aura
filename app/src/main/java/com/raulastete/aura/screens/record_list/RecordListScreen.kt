@@ -33,6 +33,7 @@ import com.raulastete.aura.core.presentation.designsystem.theme.bgGradient
 import com.raulastete.aura.screens.record_list.components.FiltersSection
 import com.raulastete.aura.screens.record_list.components.NoRecordsView
 import com.raulastete.aura.screens.record_list.components.RecordFab
+import com.raulastete.aura.screens.record_list.components.RecordList
 
 @Composable
 fun RecordListScreen(
@@ -101,7 +102,6 @@ fun RecordListContent(
                 }
 
                 state.hasRecords.not() -> {
-
                     Column(Modifier.fillMaxWidth()) {
                         FiltersSection(
                             modifier = Modifier.padding(16.dp),
@@ -124,19 +124,30 @@ fun RecordListContent(
                 }
 
                 else -> {
-                    FiltersSection(
-                        modifier = Modifier.padding(16.dp),
-                        moods = state.moodFilterList,
-                        topics = state.topicFilterList,
-                        moodChipContent = state.moodChipContent,
-                        topicChipContent = state.topicChipContent,
-                        isMoodFilterActive = state.isMoodFilterActive,
-                        isTopicFilterActive = state.isTopicFilterActive,
-                        onAction = onAction,
-                    )
+
+                    Column(Modifier.fillMaxWidth()) {
+                        FiltersSection(
+                            modifier = Modifier.padding(16.dp),
+                            moods = state.moodFilterList,
+                            topics = state.topicFilterList,
+                            moodChipContent = state.moodChipContent,
+                            topicChipContent = state.topicChipContent,
+                            isMoodFilterActive = state.isMoodFilterActive,
+                            isTopicFilterActive = state.isTopicFilterActive,
+                            onAction = onAction,
+                        )
+
+                        RecordList(
+                            modifier = Modifier
+                                .align(Alignment.CenterHorizontally),
+                            recordSections = state.recordSections,
+                            onPlayClick = { onAction(RecordListAction.OnPlayClick(it)) },
+                            onPauseClick = { onAction(RecordListAction.OnPauseClick) },
+                            onTrackSizeAvailable = { onAction(RecordListAction.OnTrackSizeAvailable(it)) },
+                        )
+                    }
                 }
             }
-
         }
     }
 }
