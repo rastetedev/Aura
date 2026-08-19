@@ -35,6 +35,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -58,6 +59,7 @@ dependencies {
     implementation(libs.androidx.compose.icons.extended)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 
+    implementation(libs.timber)
     coreLibraryDesugaring(libs.desugar.jdk.libs)
 
 }
