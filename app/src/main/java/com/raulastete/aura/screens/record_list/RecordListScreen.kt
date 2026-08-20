@@ -1,6 +1,7 @@
 package com.raulastete.aura.screens.record_list
 
 import android.Manifest
+import android.content.pm.PackageManager
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -31,6 +32,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.raulastete.aura.R
 import com.raulastete.aura.core.presentation.designsystem.theme.AuraTheme
@@ -39,7 +41,7 @@ import com.raulastete.aura.core.presentation.util.lifecycle.ObserveAsEvents
 import com.raulastete.aura.core.presentation.util.lifecycle.isAppInForeground
 import com.raulastete.aura.screens.record_list.components.FiltersSection
 import com.raulastete.aura.screens.record_list.components.NoRecordsView
-import com.raulastete.aura.screens.record_list.components.RecordFab
+import com.raulastete.aura.screens.record_list.components.QuickRecordFabButton
 import com.raulastete.aura.screens.record_list.components.RecordList
 import com.raulastete.aura.screens.record_list.components.RecordingSheet
 import com.raulastete.aura.screens.record_list.model.AudioCaptureMethod
@@ -103,6 +105,8 @@ fun RecordListContent(
     onSettingsClick: () -> Unit,
     onAction: (RecordListAction) -> Unit,
 ) {
+    val context = LocalContext.current
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -128,7 +132,35 @@ fun RecordListContent(
             )
         },
         floatingActionButton = {
-            RecordFab(onClick = { onAction(RecordListAction.OnFabClick) })
+            QuickRecordFabButton(
+                onClick = { onAction(RecordListAction.OnRecordFabClick) },
+                isQuickRecording = state.recordingState == RecordingState.QUICK_CAPTURE,
+                onLongPressEnd = { cancelledRecording ->
+                    val hasPermission = ContextCompat.checkSelfPermission(
+                        context,
+                        Manifest.permission.RECORD_AUDIO
+                    ) == PackageManager.PERMISSION_GRANTED
+
+                    if(hasPermission.not()) return@QuickRecordFabButton
+
+                    if(cancelledRecording) {
+                        onAction(RecordListAction.OnCancelRecording)
+                    } else {
+                        onAction(RecordListAction.OnCompleteRecording)
+                    }
+                },
+                onLongPressStart = {
+                    val hasPermission = ContextCompat.checkSelfPermission(
+                        context,
+                        Manifest.permission.RECORD_AUDIO
+                    ) == PackageManager.PERMISSION_GRANTED
+                    if(hasPermission) {
+                        onAction(RecordListAction.OnRecordButtonLongClick)
+                    } else {
+                        onAction(RecordListAction.OnRequestPermissionQuickRecording)
+                    }
+                }
+            )
         }
     ) { innerPadding ->
         Column(

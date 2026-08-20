@@ -1,5 +1,7 @@
 package com.raulastete.aura.screens.record_list.components
 
+import android.R.attr.contentDescription
+import android.R.attr.onClick
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -36,6 +38,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.raulastete.aura.R
+import com.raulastete.aura.core.presentation.designsystem.buttons.BubbleFabButton
 import com.raulastete.aura.core.presentation.designsystem.theme.AuraTheme
 import com.raulastete.aura.core.presentation.designsystem.theme.Microphone
 import com.raulastete.aura.core.presentation.designsystem.theme.buttonGradient
@@ -139,46 +142,21 @@ private fun SheetContent(
                 )
             }
 
-            val interactionSource = remember { MutableInteractionSource() }
-
-            Box(
-                modifier = Modifier
-                    .size(primaryBubbleSize)
-                    .background(
-                        color = if(isRecording) {
-                            MaterialTheme.colorScheme.primary95
-                        } else Color.Transparent,
-                        shape = CircleShape
+            BubbleFabButton(
+                showBubble = isRecording,
+                onClick = if (isRecording) onCompleteRecording
+                else onResumeClick,
+                icon = {
+                    Icon(
+                        imageVector = if (isRecording) Icons.Default.Check
+                        else Icons.Filled.Microphone,
+                        contentDescription = if (isRecording) stringResource(R.string.finish_recording)
+                        else stringResource(R.string.resume_recording),
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer
                     )
-                    .padding(10.dp)
-                    .background(
-                        color = if(isRecording) {
-                            MaterialTheme.colorScheme.primary90
-                        } else Color.Transparent,
-                        shape = CircleShape
-                    )
-                    .padding(16.dp)
-                    .background(
-                        brush = MaterialTheme.colorScheme.buttonGradient,
-                        shape = CircleShape
-                    )
-                    .clip(CircleShape)
-                    .clickable(
-                        interactionSource = interactionSource,
-                        indication = LocalIndication.current,
-                        onClick = if(isRecording) onCompleteRecording
-                        else onResumeClick
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = if(isRecording) Icons.Default.Check
-                    else Icons.Filled.Microphone,
-                    contentDescription = if(isRecording) stringResource(R.string.finish_recording)
-                   else stringResource(R.string.resume_recording),
-                    tint = MaterialTheme.colorScheme.onPrimaryContainer
-                )
-            }
+                },
+                primaryButtonSize = 72.dp
+            )
 
             FilledIconButton(
                 onClick = if (isRecording) onPauseClick else onCompleteRecording,

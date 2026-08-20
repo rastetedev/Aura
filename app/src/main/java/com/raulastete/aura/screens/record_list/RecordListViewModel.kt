@@ -42,18 +42,21 @@ class RecordListViewModel(
 
     fun onAction(action: RecordListAction) {
         when (action) {
-            RecordListAction.OnFabClick -> {
+            RecordListAction.OnRecordFabClick -> {
                 requestAudioPermission()
                 _state.update {
                     it.copy(currentCaptureMethod = AudioCaptureMethod.STANDARD)
                 }
             }
 
-            RecordListAction.OnFabLongClick -> {
+            RecordListAction.OnRequestPermissionQuickRecording -> {
                 requestAudioPermission()
                 _state.update {
                     it.copy(currentCaptureMethod = AudioCaptureMethod.QUICK)
                 }
+            }
+            RecordListAction.OnRecordButtonLongClick -> {
+                startRecording(captureMethod = AudioCaptureMethod.QUICK)
             }
 
             is RecordListAction.OnFilterByMoodToggle -> toggleMoodFilter(action.mood)
