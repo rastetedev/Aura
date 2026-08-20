@@ -1,8 +1,10 @@
 package com.raulastete.aura.screens.record_list
 
+import com.raulastete.aura.core.domain.recording.RecordingDetails
+
 sealed interface RecordListEvent {
 
     data object RequestAudioPermission: RecordListEvent
     data object RecordingTooShort: RecordListEvent
-    data object OnDoneRecording: RecordListEvent
+    data class OnDoneRecording(val details: RecordingDetails): RecordListEvent
 }

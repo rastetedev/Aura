@@ -6,7 +6,6 @@ import com.raulastete.aura.R
 import com.raulastete.aura.core.domain.recording.VoiceRecorder
 import com.raulastete.aura.core.presentation.designsystem.dropdowns.Selectable
 import com.raulastete.aura.core.presentation.model.MoodUi
-import com.raulastete.aura.core.presentation.model.RecordUi
 import com.raulastete.aura.core.presentation.util.string.UiText
 import com.raulastete.aura.screens.record_list.model.AudioCaptureMethod
 import com.raulastete.aura.screens.record_list.model.RecordingState
@@ -21,7 +20,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlin.random.Random
 
 class RecordListViewModel(
     private val voiceRecorder: VoiceRecorder
@@ -89,23 +87,6 @@ class RecordListViewModel(
         ) { selectedTopics, selectedMoods ->
             _state.update {
                 it.copy(
-                    records = mapOf(
-                        UiText.StringResource(R.string.today) to (1..5).map { index ->
-                            createMockRecord(
-                                index
-                            )
-                        },
-                        UiText.StringResource(R.string.yesterday) to (6..10).map { index ->
-                            createMockRecord(
-                                index
-                            )
-                        },
-                        UiText.Dynamic("17 Agust, 2026") to (11..15).map { index ->
-                            createMockRecord(
-                                index
-                            )
-                        }
-                    ),
                     topicFilterList = listOf("Topic A", "Topic B", "Topic C").map { topic ->
                         Selectable(
                             item = topic,
@@ -222,7 +203,7 @@ class RecordListViewModel(
             if (recordingDetails.duration < VoiceRecorder.MIN_RECORD_DURATION) {
                 eventChannel.send(RecordListEvent.RecordingTooShort)
             } else {
-                eventChannel.send(RecordListEvent.OnDoneRecording)
+                eventChannel.send(RecordListEvent.OnDoneRecording(recordingDetails))
             }
         }
     }
@@ -259,18 +240,5 @@ class RecordListViewModel(
 
     private fun requestAudioPermission() = viewModelScope.launch {
         eventChannel.send(RecordListEvent.RequestAudioPermission)
-    }
-
-    private fun createMockRecord(id: Int): RecordUi {
-        val moods = MoodUi.entries
-        return RecordUi(
-            id = id,
-            title = "Record $id",
-            mood = moods[id % moods.size],
-            recordedAt = java.time.Instant.now(),
-            note = "This is a random note for record number $id. " + (1..10).joinToString(" ") { "Hello" },
-            topics = listOf("Topic A", "Topic B"),
-            amplitudes = (1..35).map { Random.nextFloat() }
-        )
     }
 }

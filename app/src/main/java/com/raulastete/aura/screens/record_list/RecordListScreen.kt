@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.raulastete.aura.R
+import com.raulastete.aura.core.domain.recording.RecordingDetails
 import com.raulastete.aura.core.presentation.designsystem.theme.AuraTheme
 import com.raulastete.aura.core.presentation.designsystem.theme.bgGradient
 import com.raulastete.aura.core.presentation.util.lifecycle.ObserveAsEvents
@@ -51,7 +52,8 @@ import timber.log.Timber
 
 @Composable
 fun RecordListScreen(
-    viewModel: RecordListViewModel = koinViewModel()
+    viewModel: RecordListViewModel = koinViewModel(),
+    onNavigateToCreateRecord: (RecordingDetails) -> Unit,
 ) {
     val context = LocalContext.current
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -79,7 +81,7 @@ fun RecordListScreen(
             }
 
             is RecordListEvent.OnDoneRecording -> {
-                Timber.d("Recording successful!")
+                onNavigateToCreateRecord(event.details)
             }
         }
     }

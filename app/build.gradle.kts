@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -49,6 +50,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.process)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.navigation.compose)
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
@@ -59,16 +61,15 @@ dependencies {
     implementation(libs.androidx.compose.icons)
     implementation(libs.androidx.compose.icons.extended)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.kotlinx.serialization.json)
 
     implementation(libs.timber)
     coreLibraryDesugaring(libs.desugar.jdk.libs)
 
-    dependencies {
-        implementation(platform(libs.koin.bom))
-        implementation(libs.koin.android)  // No version needed
-        implementation(libs.koin.core)
-        implementation(libs.koin.compose)
-        implementation(libs.koin.compose.viewmodel)
-    }
+    implementation(platform(libs.koin.bom))
+    implementation(libs.koin.android)  // No version needed
+    implementation(libs.koin.core)
+    implementation(libs.koin.compose)
+    implementation(libs.koin.compose.viewmodel)
 
 }

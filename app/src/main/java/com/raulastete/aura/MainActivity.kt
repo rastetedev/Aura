@@ -4,8 +4,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.navigation.compose.rememberNavController
 import com.raulastete.aura.core.presentation.designsystem.theme.AuraTheme
-import com.raulastete.aura.screens.record_list.RecordListScreen
+import com.raulastete.aura.navigation.NavigationRoot
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -14,7 +15,9 @@ class MainActivity : ComponentActivity() {
         setContent {
 
             AuraTheme {
-                RecordListScreen()
+                NavigationRoot(
+                    navController = rememberNavController(),
+                )
             }
         }
     }
