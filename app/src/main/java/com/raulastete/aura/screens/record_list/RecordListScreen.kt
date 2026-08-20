@@ -22,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,6 +36,7 @@ import com.raulastete.aura.R
 import com.raulastete.aura.core.presentation.designsystem.theme.AuraTheme
 import com.raulastete.aura.core.presentation.designsystem.theme.bgGradient
 import com.raulastete.aura.core.presentation.util.lifecycle.ObserveAsEvents
+import com.raulastete.aura.core.presentation.util.lifecycle.isAppInForeground
 import com.raulastete.aura.screens.record_list.components.FiltersSection
 import com.raulastete.aura.screens.record_list.components.NoRecordsView
 import com.raulastete.aura.screens.record_list.components.RecordFab
@@ -65,6 +67,7 @@ fun RecordListScreen(
             RecordListEvent.RequestAudioPermission -> {
                 permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
             }
+
             is RecordListEvent.RecordingTooShort -> {
                 Toast.makeText(
                     context,
@@ -72,9 +75,17 @@ fun RecordListScreen(
                     Toast.LENGTH_LONG
                 ).show()
             }
+
             is RecordListEvent.OnDoneRecording -> {
                 Timber.d("Recording successful!")
             }
+        }
+    }
+
+    val isAppInForeground by isAppInForeground()
+    LaunchedEffect(isAppInForeground, state.recordingState) {
+        if(state.recordingState == RecordingState.NORMAL_CAPTURE && isAppInForeground.not()){
+            viewModel.onAction(RecordListAction.OnPauseRecordingClick)
         }
     }
 
@@ -192,7 +203,11 @@ fun RecordListContent(
                 }
             }
 
-            if(state.recordingState in listOf(RecordingState.NORMAL_CAPTURE, RecordingState.PAUSED)) {
+            if (state.recordingState in listOf(
+                    RecordingState.NORMAL_CAPTURE,
+                    RecordingState.PAUSED
+                )
+            ) {
                 RecordingSheet(
                     formattedRecordDuration = state.formattedRecordDuration,
                     isRecording = state.recordingState == RecordingState.NORMAL_CAPTURE,
