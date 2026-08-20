@@ -1,6 +1,7 @@
 package com.raulastete.aura.core.domain.recording
 
 import kotlinx.coroutines.flow.StateFlow
+import kotlin.time.Duration.Companion.seconds
 
 interface VoiceRecorder {
 
@@ -10,4 +11,8 @@ interface VoiceRecorder {
     fun stop()
     fun resume()
     fun cancel()
+
+    companion object {
+        val MIN_RECORD_DURATION = 1.5.seconds
+    }
 }

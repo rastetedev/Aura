@@ -1,6 +1,7 @@
 package com.raulastete.aura.screens.record_list
 
 import android.Manifest
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -25,6 +26,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -37,13 +39,17 @@ import com.raulastete.aura.screens.record_list.components.FiltersSection
 import com.raulastete.aura.screens.record_list.components.NoRecordsView
 import com.raulastete.aura.screens.record_list.components.RecordFab
 import com.raulastete.aura.screens.record_list.components.RecordList
+import com.raulastete.aura.screens.record_list.components.RecordingSheet
 import com.raulastete.aura.screens.record_list.model.AudioCaptureMethod
+import com.raulastete.aura.screens.record_list.model.RecordingState
 import org.koin.androidx.compose.koinViewModel
+import timber.log.Timber
 
 @Composable
 fun RecordListScreen(
     viewModel: RecordListViewModel = koinViewModel()
 ) {
+    val context = LocalContext.current
     val state by viewModel.state.collectAsStateWithLifecycle()
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
@@ -58,6 +64,16 @@ fun RecordListScreen(
         when (event) {
             RecordListEvent.RequestAudioPermission -> {
                 permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+            }
+            is RecordListEvent.RecordingTooShort -> {
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.audio_recording_was_too_short),
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+            is RecordListEvent.OnDoneRecording -> {
+                Timber.d("Recording successful!")
             }
         }
     }
@@ -163,7 +179,7 @@ fun RecordListContent(
                                 .align(Alignment.CenterHorizontally),
                             recordSections = state.recordSections,
                             onPlayClick = { onAction(RecordListAction.OnPlayClick(it)) },
-                            onPauseClick = { onAction(RecordListAction.OnPauseClick) },
+                            onPauseClick = { onAction(RecordListAction.OnPauseRecordingClick) },
                             onTrackSizeAvailable = {
                                 onAction(
                                     RecordListAction.OnTrackSizeAvailable(
@@ -174,6 +190,17 @@ fun RecordListContent(
                         )
                     }
                 }
+            }
+
+            if(state.recordingState in listOf(RecordingState.NORMAL_CAPTURE, RecordingState.PAUSED)) {
+                RecordingSheet(
+                    formattedRecordDuration = state.formattedRecordDuration,
+                    isRecording = state.recordingState == RecordingState.NORMAL_CAPTURE,
+                    onDismiss = { onAction(RecordListAction.OnCancelRecording) },
+                    onPauseClick = { onAction(RecordListAction.OnPauseRecordingClick) },
+                    onResumeClick = { onAction(RecordListAction.OnResumeRecordingClick) },
+                    onCompleteRecording = { onAction(RecordListAction.OnCompleteRecording) },
+                )
             }
         }
     }

@@ -9,15 +9,18 @@ import com.raulastete.aura.core.presentation.model.MoodUi
 import com.raulastete.aura.core.presentation.model.RecordUi
 import com.raulastete.aura.core.presentation.util.string.UiText
 import com.raulastete.aura.screens.record_list.model.AudioCaptureMethod
+import com.raulastete.aura.screens.record_list.model.RecordingState
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import kotlin.random.Random
 
 class RecordListViewModel(
@@ -45,27 +48,27 @@ class RecordListViewModel(
                     it.copy(currentCaptureMethod = AudioCaptureMethod.STANDARD)
                 }
             }
+
             RecordListAction.OnFabLongClick -> {
                 requestAudioPermission()
                 _state.update {
                     it.copy(currentCaptureMethod = AudioCaptureMethod.QUICK)
                 }
             }
-            is RecordListAction.OnFilterByMoodToggle ->
-                toggleMoodFilter(action.mood)
 
-            is RecordListAction.OnFilterByTopicToggle ->
-                toggleTopicFilter(action.topic)
+            is RecordListAction.OnFilterByMoodToggle -> toggleMoodFilter(action.mood)
+            is RecordListAction.OnFilterByTopicToggle -> toggleTopicFilter(action.topic)
+            is RecordListAction.OnRemoveFilters -> removeFilters(action.recordFilterDropdown)
 
-            is RecordListAction.OnRemoveFilters ->
-                removeFilters(action.recordFilterDropdown)
-
-            RecordListAction.OnPauseClick -> TODO()
             is RecordListAction.OnPlayClick -> TODO()
+            RecordListAction.OnPauseAudioClick -> {}
             is RecordListAction.OnTrackSizeAvailable -> TODO()
-            RecordListAction.OnAudioPermissionGranted -> {
-                Timber.d("Recording started...")
-            }
+
+            RecordListAction.OnAudioPermissionGranted -> startRecording(captureMethod = AudioCaptureMethod.STANDARD)
+            RecordListAction.OnCancelRecording -> cancelRecording()
+            RecordListAction.OnCompleteRecording -> stopRecording()
+            RecordListAction.OnPauseRecordingClick -> pauseRecording()
+            RecordListAction.OnResumeRecordingClick -> resumeRecording()
         }
     }
 
@@ -164,6 +167,79 @@ class RecordListViewModel(
             moodIcons = this.map { it.iconSet.fill },
             title = title
         )
+    }
+
+    private fun startRecording(captureMethod: AudioCaptureMethod) {
+        _state.update {
+            it.copy(
+                recordingState = when (captureMethod) {
+                    AudioCaptureMethod.STANDARD -> RecordingState.NORMAL_CAPTURE
+                    AudioCaptureMethod.QUICK -> RecordingState.QUICK_CAPTURE
+                }
+            )
+        }
+        voiceRecorder.start()
+
+        if (captureMethod == AudioCaptureMethod.STANDARD) {
+            voiceRecorder
+                .recordingDetails
+                .distinctUntilChangedBy { it.duration }
+                .map { it.duration }
+                .onEach { duration ->
+                    _state.update {
+                        it.copy(
+                            recordingElapsedDuration = duration
+                        )
+                    }
+                }
+                .launchIn(viewModelScope)
+        }
+    }
+
+    private fun cancelRecording() {
+        _state.update {
+            it.copy(
+                recordingState = RecordingState.NOT_RECORDING,
+                currentCaptureMethod = null
+            )
+        }
+        voiceRecorder.cancel()
+    }
+
+    private fun stopRecording() {
+        voiceRecorder.stop()
+        _state.update {
+            it.copy(
+                recordingState = RecordingState.NOT_RECORDING
+            )
+        }
+
+        val recordingDetails = voiceRecorder.recordingDetails.value
+        viewModelScope.launch {
+            if (recordingDetails.duration < VoiceRecorder.MIN_RECORD_DURATION) {
+                eventChannel.send(RecordListEvent.RecordingTooShort)
+            } else {
+                eventChannel.send(RecordListEvent.OnDoneRecording)
+            }
+        }
+    }
+
+    private fun resumeRecording() {
+        voiceRecorder.resume()
+        _state.update {
+            it.copy(
+                recordingState = RecordingState.NORMAL_CAPTURE
+            )
+        }
+    }
+
+    private fun pauseRecording() {
+        voiceRecorder.pause()
+        _state.update {
+            it.copy(
+                recordingState = RecordingState.PAUSED
+            )
+        }
     }
 
     private fun List<String>.asTopicChipContent(): UiText {

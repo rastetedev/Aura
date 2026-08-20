@@ -11,7 +11,11 @@ sealed interface RecordListAction {
     data object OnFabLongClick : RecordListAction
     data class OnRemoveFilters(val recordFilterDropdown: RecordFilterDropdown) : RecordListAction
     data class OnPlayClick(val recordId: Int) : RecordListAction
-    data object OnPauseClick : RecordListAction
+    data object OnPauseRecordingClick : RecordListAction
+    data object OnResumeRecordingClick : RecordListAction
+    data object OnCompleteRecording : RecordListAction
+    data object OnPauseAudioClick : RecordListAction
+    data object OnCancelRecording: RecordListAction
     data class OnTrackSizeAvailable(val trackSizeInfo: TrackSizeInfo) : RecordListAction
     data object OnAudioPermissionGranted : RecordListAction
 }
