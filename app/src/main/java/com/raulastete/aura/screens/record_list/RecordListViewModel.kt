@@ -7,11 +7,16 @@ import com.raulastete.aura.core.presentation.designsystem.dropdowns.Selectable
 import com.raulastete.aura.core.presentation.model.MoodUi
 import com.raulastete.aura.core.presentation.model.RecordUi
 import com.raulastete.aura.core.presentation.util.string.UiText
+import com.raulastete.aura.screens.record_list.model.AudioCaptureMethod
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import timber.log.Timber
 import kotlin.random.Random
 
 class RecordListViewModel : ViewModel() {
@@ -22,14 +27,27 @@ class RecordListViewModel : ViewModel() {
     private val _state = MutableStateFlow(RecordListUiState())
     val state = _state.asStateFlow()
 
+    private val eventChannel = Channel<RecordListEvent>()
+    val events = eventChannel.receiveAsFlow()
+
     init {
         observeFilters()
     }
 
     fun onAction(action: RecordListAction) {
         when (action) {
-            RecordListAction.OnFabClick -> {}
-            RecordListAction.OnFabLongClick -> {}
+            RecordListAction.OnFabClick -> {
+                requestAudioPermission()
+                _state.update {
+                    it.copy(currentCaptureMethod = AudioCaptureMethod.STANDARD)
+                }
+            }
+            RecordListAction.OnFabLongClick -> {
+                requestAudioPermission()
+                _state.update {
+                    it.copy(currentCaptureMethod = AudioCaptureMethod.QUICK)
+                }
+            }
             is RecordListAction.OnFilterByMoodToggle ->
                 toggleMoodFilter(action.mood)
 
@@ -42,6 +60,9 @@ class RecordListViewModel : ViewModel() {
             RecordListAction.OnPauseClick -> TODO()
             is RecordListAction.OnPlayClick -> TODO()
             is RecordListAction.OnTrackSizeAvailable -> TODO()
+            RecordListAction.OnAudioPermissionGranted -> {
+                Timber.d("Recording started...")
+            }
         }
     }
 
@@ -60,9 +81,21 @@ class RecordListViewModel : ViewModel() {
             _state.update {
                 it.copy(
                     records = mapOf(
-                        UiText.StringResource(R.string.today) to (1..5).map { index -> createMockRecord(index) },
-                        UiText.StringResource(R.string.yesterday) to (6..10).map { index -> createMockRecord(index) },
-                        UiText.Dynamic("17 Agust, 2026") to (11..15).map { index -> createMockRecord(index) }
+                        UiText.StringResource(R.string.today) to (1..5).map { index ->
+                            createMockRecord(
+                                index
+                            )
+                        },
+                        UiText.StringResource(R.string.yesterday) to (6..10).map { index ->
+                            createMockRecord(
+                                index
+                            )
+                        },
+                        UiText.Dynamic("17 Agust, 2026") to (11..15).map { index ->
+                            createMockRecord(
+                                index
+                            )
+                        }
                     ),
                     topicFilterList = listOf("Topic A", "Topic B", "Topic C").map { topic ->
                         Selectable(
@@ -140,6 +173,10 @@ class RecordListViewModel : ViewModel() {
                 UiText.Dynamic("${this.first()}, ${this[1]} +$extraElementCount")
             }
         }
+    }
+
+    private fun requestAudioPermission() = viewModelScope.launch {
+        eventChannel.send(RecordListEvent.RequestAudioPermission)
     }
 
     private fun createMockRecord(id: Int): RecordUi {

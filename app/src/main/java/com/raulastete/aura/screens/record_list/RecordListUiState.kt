@@ -5,10 +5,12 @@ import com.raulastete.aura.core.presentation.designsystem.dropdowns.Selectable
 import com.raulastete.aura.core.presentation.model.MoodUi
 import com.raulastete.aura.core.presentation.model.RecordUi
 import com.raulastete.aura.core.presentation.util.string.UiText
+import com.raulastete.aura.screens.record_list.model.AudioCaptureMethod
 import com.raulastete.aura.screens.record_list.model.RecordDaySection
 
 data class RecordListUiState(
     val records: Map<UiText, List<RecordUi>> = emptyMap(),
+    val currentCaptureMethod: AudioCaptureMethod? = null,
     val isLoadingData: Boolean = false,
     val moodFilterList: List<Selectable<MoodUi>> = emptyList(),
     val topicFilterList: List<Selectable<String>> = emptyList(),

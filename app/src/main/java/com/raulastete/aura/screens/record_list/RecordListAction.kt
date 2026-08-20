@@ -13,4 +13,5 @@ sealed interface RecordListAction {
     data class OnPlayClick(val recordId: Int) : RecordListAction
     data object OnPauseClick : RecordListAction
     data class OnTrackSizeAvailable(val trackSizeInfo: TrackSizeInfo) : RecordListAction
+    data object OnAudioPermissionGranted : RecordListAction
 }

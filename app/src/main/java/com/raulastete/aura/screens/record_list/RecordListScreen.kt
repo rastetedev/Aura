@@ -1,5 +1,8 @@
 package com.raulastete.aura.screens.record_list
 
+import android.Manifest
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,16 +33,34 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.raulastete.aura.R
 import com.raulastete.aura.core.presentation.designsystem.theme.AuraTheme
 import com.raulastete.aura.core.presentation.designsystem.theme.bgGradient
+import com.raulastete.aura.core.presentation.util.lifecycle.ObserveAsEvents
 import com.raulastete.aura.screens.record_list.components.FiltersSection
 import com.raulastete.aura.screens.record_list.components.NoRecordsView
 import com.raulastete.aura.screens.record_list.components.RecordFab
 import com.raulastete.aura.screens.record_list.components.RecordList
+import com.raulastete.aura.screens.record_list.model.AudioCaptureMethod
 
 @Composable
 fun RecordListScreen(
     viewModel: RecordListViewModel = viewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted ->
+            if (isGranted && state.currentCaptureMethod == AudioCaptureMethod.STANDARD) {
+                viewModel.onAction(RecordListAction.OnAudioPermissionGranted)
+            }
+        }
+    )
+
+    ObserveAsEvents(viewModel.events) { event ->
+        when (event) {
+            RecordListEvent.RequestAudioPermission -> {
+                permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+            }
+        }
+    }
 
     RecordListContent(
         state = state,
@@ -143,7 +164,13 @@ fun RecordListContent(
                             recordSections = state.recordSections,
                             onPlayClick = { onAction(RecordListAction.OnPlayClick(it)) },
                             onPauseClick = { onAction(RecordListAction.OnPauseClick) },
-                            onTrackSizeAvailable = { onAction(RecordListAction.OnTrackSizeAvailable(it)) },
+                            onTrackSizeAvailable = {
+                                onAction(
+                                    RecordListAction.OnTrackSizeAvailable(
+                                        it
+                                    )
+                                )
+                            },
                         )
                     }
                 }
