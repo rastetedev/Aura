@@ -1,9 +1,12 @@
 package com.raulastete.aura
 
 import android.app.Application
+import com.raulastete.aura.screens.record_list.recordListModule
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.context.startKoin
 import timber.log.Timber
 
 class AuraApp : Application() {
@@ -15,6 +18,13 @@ class AuraApp : Application() {
 
         if(BuildConfig.DEBUG){
             Timber.plant(Timber.DebugTree())
+        }
+
+        startKoin {
+            androidContext(this@AuraApp)
+            modules(
+                appModule, recordListModule
+            )
         }
     }
 }

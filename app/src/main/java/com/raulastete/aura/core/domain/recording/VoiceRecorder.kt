@@ -2,7 +2,7 @@ package com.raulastete.aura.core.domain.recording
 
 import kotlinx.coroutines.flow.StateFlow
 
-interface VoiceRecording {
+interface VoiceRecorder {
 
     val recordingDetails: StateFlow<RecordingDetails>
     fun start()

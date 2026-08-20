@@ -4,7 +4,7 @@ import android.content.Context
 import android.media.MediaRecorder
 import android.os.Build
 import com.raulastete.aura.core.domain.recording.RecordingDetails
-import com.raulastete.aura.core.domain.recording.VoiceRecording
+import com.raulastete.aura.core.domain.recording.VoiceRecorder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -20,10 +20,10 @@ import java.io.IOException
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.uuid.Uuid
 
-class AndroidVoiceRecording(
+class AndroidVoiceRecorder(
     private val context: Context,
     private val applicationScope: CoroutineScope
-) : VoiceRecording {
+) : VoiceRecorder {
 
     companion object {
         private const val MAX_AMPLITUDE_VALUE = 26_000L

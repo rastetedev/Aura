@@ -3,6 +3,7 @@ package com.raulastete.aura.screens.record_list
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.raulastete.aura.R
+import com.raulastete.aura.core.domain.recording.VoiceRecorder
 import com.raulastete.aura.core.presentation.designsystem.dropdowns.Selectable
 import com.raulastete.aura.core.presentation.model.MoodUi
 import com.raulastete.aura.core.presentation.model.RecordUi
@@ -19,7 +20,9 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import kotlin.random.Random
 
-class RecordListViewModel : ViewModel() {
+class RecordListViewModel(
+    private val voiceRecorder: VoiceRecorder
+) : ViewModel() {
 
     private val selectedMoodFilters = MutableStateFlow<List<MoodUi>>(emptyList())
     private val selectedTopicFilters = MutableStateFlow<List<String>>(emptyList())

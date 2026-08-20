@@ -29,7 +29,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.raulastete.aura.R
 import com.raulastete.aura.core.presentation.designsystem.theme.AuraTheme
 import com.raulastete.aura.core.presentation.designsystem.theme.bgGradient
@@ -39,10 +38,11 @@ import com.raulastete.aura.screens.record_list.components.NoRecordsView
 import com.raulastete.aura.screens.record_list.components.RecordFab
 import com.raulastete.aura.screens.record_list.components.RecordList
 import com.raulastete.aura.screens.record_list.model.AudioCaptureMethod
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun RecordListScreen(
-    viewModel: RecordListViewModel = viewModel()
+    viewModel: RecordListViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val permissionLauncher = rememberLauncherForActivityResult(

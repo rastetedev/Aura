@@ -62,4 +62,12 @@ dependencies {
     implementation(libs.timber)
     coreLibraryDesugaring(libs.desugar.jdk.libs)
 
+    dependencies {
+        implementation(platform(libs.koin.bom))
+        implementation(libs.koin.android)  // No version needed
+        implementation(libs.koin.core)
+        implementation(libs.koin.compose)
+        implementation(libs.koin.compose.viewmodel)
+    }
+
 }
