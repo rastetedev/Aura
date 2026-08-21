@@ -34,7 +34,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
 class CreateRecordViewModel(
-    savedStateHandle: SavedStateHandle,
+    private val savedStateHandle: SavedStateHandle,
     private val recordingStorage: RecordingStorage,
     private val audioPlayer: AudioPlayer
 ) : ViewModel() {
@@ -50,8 +50,20 @@ class CreateRecordViewModel(
     private val eventChannel = Channel<CreateRecordEvent>()
     val events = eventChannel.receiveAsFlow()
 
+    private val restoredTopics = savedStateHandle.get<String>("topics")?.split(",")
+
     private val _state = MutableStateFlow(
-        CreateRecordUiState(playbackTotalDuration = recordingDetails.duration)
+        CreateRecordUiState(
+            playbackTotalDuration = recordingDetails.duration,
+            title = savedStateHandle["title"] ?: "",
+            note = savedStateHandle["note"] ?: "",
+            topics = restoredTopics ?: emptyList(),
+            mood = savedStateHandle.get<String>("mood")?.let {
+                MoodUi.valueOf(it)
+            },
+            showMoodSelector = savedStateHandle.get<String>("mood") == null,
+            canSaveRecord = savedStateHandle.get<Boolean>("canSaveRecord") == true
+        )
     )
     val state = _state
         .onStart {
@@ -59,6 +71,12 @@ class CreateRecordViewModel(
                 observeAddTopicText()
                 hasLoadedInitialData = true
             }
+        }.onEach { state ->
+            savedStateHandle["title"] = state.title
+            savedStateHandle["note"] = state.note
+            savedStateHandle["topics"] = state.topics.joinToString(",")
+            savedStateHandle["mood"] = state.mood?.name
+            savedStateHandle["canSaveRecord"] = state.canSaveRecord
         }
         .stateIn(
             scope = viewModelScope,
@@ -73,7 +91,7 @@ class CreateRecordViewModel(
             CreateRecordAction.OnDismissMoodSelector -> onDismissMoodSelector()
             CreateRecordAction.OnDismissTopicSuggestions -> onDismissTopicSuggestions()
             is CreateRecordAction.OnMoodClick -> onMoodClick(action.moodUi)
-            is CreateRecordAction.OnNoteTextChange -> TODO()
+            is CreateRecordAction.OnNoteTextChange ->  onNoteTextChange(action.text)
             CreateRecordAction.OnPauseAudioClick -> audioPlayer.pause()
             CreateRecordAction.OnPlayAudioClick -> onPlayAudioClick()
             is CreateRecordAction.OnRemoveTopicClick -> onRemoveTopicClick(action.topic)
@@ -205,6 +223,12 @@ class CreateRecordViewModel(
                 canSaveRecord = text.isNotBlank() && it.mood != null
             )
         }
+    }
+
+    private fun onNoteTextChange(text: String) {
+        _state.update { it.copy(
+            note = text
+        ) }
     }
 
     private fun onSaveClick() {
