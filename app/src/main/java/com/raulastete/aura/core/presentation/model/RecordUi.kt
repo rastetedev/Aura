@@ -15,6 +15,7 @@ data class RecordUi(
     val playbackTotalDuration : Duration = Duration.ZERO,
     val playbackCurrentDuration : Duration = Duration.ZERO,
     val playbackState: PlaybackState = PlaybackState.IDLE,
+    val audioFilePath: String,
 ){
     val formattedRecordedAt = recordedAt.formatHHmm()
     val playbackRatio = playbackCurrentDuration.div(playbackTotalDuration).toFloat()

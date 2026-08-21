@@ -101,6 +101,7 @@ private fun createMockRecord(id: Int): RecordUi {
         recordedAt = java.time.Instant.now(),
         note = "This is a random note for record number $id. " + (1..10).joinToString(" ") { "Hello" },
         topics = listOf("Topic A", "Topic B"),
-        amplitudes = (1..35).map { Random.nextFloat() }
+        amplitudes = (1..35).map { Random.nextFloat() },
+        audioFilePath = "file://record$id.mp3"
     )
 }

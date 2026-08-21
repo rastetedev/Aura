@@ -3,6 +3,7 @@ package com.raulastete.aura.screens.record_list
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.raulastete.aura.R
+import com.raulastete.aura.core.domain.audio.AudioPlayer
 import com.raulastete.aura.core.domain.recording.VoiceRecorder
 import com.raulastete.aura.core.presentation.designsystem.dropdowns.Selectable
 import com.raulastete.aura.core.presentation.model.MoodUi
@@ -20,11 +21,14 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.time.Duration
 
 class RecordListViewModel(
-    private val voiceRecorder: VoiceRecorder
+    private val voiceRecorder: VoiceRecorder,
+    private val audioPlayer: AudioPlayer,
 ) : ViewModel() {
 
+    private val playingEchoId = MutableStateFlow<Int?>(null)
     private val selectedMoodFilters = MutableStateFlow<List<MoodUi>>(emptyList())
     private val selectedTopicFilters = MutableStateFlow<List<String>>(emptyList())
 
@@ -61,8 +65,8 @@ class RecordListViewModel(
             is RecordListAction.OnFilterByTopicToggle -> toggleTopicFilter(action.topic)
             is RecordListAction.OnRemoveFilters -> removeFilters(action.recordFilterDropdown)
 
-            is RecordListAction.OnPlayClick -> TODO()
-            RecordListAction.OnPauseAudioClick -> {}
+            is RecordListAction.OnPlayClick ->  onPlayRecordClick(action.recordId)
+            RecordListAction.OnPauseAudioClick ->  audioPlayer.pause()
             is RecordListAction.OnTrackSizeAvailable -> TODO()
 
             RecordListAction.OnAudioPermissionGranted -> startRecording(captureMethod = AudioCaptureMethod.STANDARD)
@@ -240,5 +244,36 @@ class RecordListViewModel(
 
     private fun requestAudioPermission() = viewModelScope.launch {
         eventChannel.send(RecordListEvent.RequestAudioPermission)
+    }
+
+    private fun onPlayRecordClick(echoId: Int) {
+        val selectedRecord = state.value.records.values.flatten().first { it.id == echoId }
+        val activeTrack = audioPlayer.activeTrack.value
+        val isNewEcho = playingEchoId.value != echoId
+        val isSameEchoIsPlayingFromBeginning = echoId == playingEchoId.value && activeTrack != null
+                && activeTrack.durationPlayed == Duration.ZERO
+
+        when {
+            isNewEcho || isSameEchoIsPlayingFromBeginning -> {
+                playingEchoId.update { echoId }
+                audioPlayer.stop()
+                audioPlayer.play(
+                    filePath = selectedRecord.audioFilePath,
+                    onComplete = ::completePlayback
+                )
+            }
+            else -> audioPlayer.resume()
+        }
+    }
+
+    private fun completePlayback() {
+        _state.update { it.copy(
+            records = it.records.mapValues { (_, echos) ->
+                echos.map { echo ->
+                    echo.copy(playbackCurrentDuration = Duration.ZERO)
+                }
+            }
+        ) }
+        playingEchoId.update { null }
     }
 }

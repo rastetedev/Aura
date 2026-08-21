@@ -4,20 +4,24 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.raulastete.aura.core.domain.audio.AudioPlayer
 import com.raulastete.aura.core.domain.recording.RecordingStorage
 import com.raulastete.aura.core.presentation.designsystem.dropdowns.asUnselectedItems
 import com.raulastete.aura.core.presentation.model.MoodUi
+import com.raulastete.aura.core.presentation.model.PlaybackState
 import com.raulastete.aura.core.presentation.model.TrackSizeInfo
 import com.raulastete.aura.core.presentation.util.amplitude.AmplitudeNormalizer
 import com.raulastete.aura.navigation.NavigationRoute
 import com.raulastete.aura.navigation.toRecordingDetails
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -26,14 +30,17 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
 class CreateRecordViewModel(
     savedStateHandle: SavedStateHandle,
-    private val recordingStorage: RecordingStorage
+    private val recordingStorage: RecordingStorage,
+    private val audioPlayer: AudioPlayer
 ) : ViewModel() {
 
     private var hasLoadedInitialData = false
+    private var durationJob: Job? = null
 
     private val recordingDetails =
         savedStateHandle
@@ -43,7 +50,9 @@ class CreateRecordViewModel(
     private val eventChannel = Channel<CreateRecordEvent>()
     val events = eventChannel.receiveAsFlow()
 
-    private val _state = MutableStateFlow(CreateRecordUiState())
+    private val _state = MutableStateFlow(
+        CreateRecordUiState(playbackTotalDuration = recordingDetails.duration)
+    )
     val state = _state
         .onStart {
             if (!hasLoadedInitialData) {
@@ -65,8 +74,8 @@ class CreateRecordViewModel(
             CreateRecordAction.OnDismissTopicSuggestions -> onDismissTopicSuggestions()
             is CreateRecordAction.OnMoodClick -> onMoodClick(action.moodUi)
             is CreateRecordAction.OnNoteTextChange -> TODO()
-            CreateRecordAction.OnPauseAudioClick -> TODO()
-            CreateRecordAction.OnPlayAudioClick -> TODO()
+            CreateRecordAction.OnPauseAudioClick -> audioPlayer.pause()
+            CreateRecordAction.OnPlayAudioClick -> onPlayAudioClick()
             is CreateRecordAction.OnRemoveTopicClick -> onRemoveTopicClick(action.topic)
             CreateRecordAction.OnSaveClick -> onSaveClick()
             is CreateRecordAction.OnTitleTextChange -> onTitleTextChange(action.text)
@@ -89,9 +98,11 @@ class CreateRecordViewModel(
                 spacing = trackSizeInfo.spacing
             )
 
-            _state.update { it.copy(
-                playbackAmplitudes = finalAmplitudes
-            ) }
+            _state.update {
+                it.copy(
+                    playbackAmplitudes = finalAmplitudes
+                )
+            }
         }
     }
 
@@ -211,6 +222,35 @@ class CreateRecordViewModel(
             }
 
             // TODO: Echo
+        }
+    }
+
+    private fun onPlayAudioClick() {
+        if(state.value.playbackState == PlaybackState.PAUSED) {
+            audioPlayer.resume()
+        } else {
+            audioPlayer.play(
+                filePath = recordingDetails.filePath ?: throw IllegalArgumentException(
+                    "File path can't be null"
+                ),
+                onComplete = {
+                    _state.update { it.copy(
+                        playbackState = PlaybackState.IDLE,
+                        durationPlayed = Duration.ZERO
+                    ) }
+                }
+            )
+
+            durationJob = audioPlayer
+                .activeTrack
+                .filterNotNull()
+                .onEach { track ->
+                    _state.update { it.copy(
+                        playbackState = if(track.isPlaying) PlaybackState.PLAYING else PlaybackState.PAUSED,
+                        durationPlayed = track.durationPlayed
+                    ) }
+                }
+                .launchIn(viewModelScope)
         }
     }
 }

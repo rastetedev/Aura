@@ -92,7 +92,8 @@ private fun RecordTimelineItemPreview() {
                 recordedAt = Instant.now(),
                 note = (1..50).joinToString { "Hello" },
                 topics = listOf("Hello", "World"),
-                amplitudes = (1..35).map { Random.nextFloat() }
+                amplitudes = (1..35).map { Random.nextFloat() },
+                audioFilePath = "file://record.mp3"
             ),
             relativePosition = RecordPosition.FIRST,
             onPlayClick = {},
