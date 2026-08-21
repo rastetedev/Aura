@@ -54,6 +54,7 @@ import com.raulastete.aura.core.presentation.designsystem.theme.AuraTheme
 import com.raulastete.aura.core.presentation.designsystem.theme.secondary70
 import com.raulastete.aura.core.presentation.designsystem.theme.secondary95
 import com.raulastete.aura.screens.create_record.components.SelectMoodSheet
+import com.raulastete.aura.screens.create_record.components.TopicsRow
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -116,7 +117,7 @@ private fun CreateRecordContent(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                if(state.mood == null) {
+                if (state.mood == null) {
                     FilledIconButton(
                         onClick = {
                             onAction(CreateRecordAction.OnSelectMoodClick)
@@ -177,7 +178,17 @@ private fun CreateRecordContent(
                 onTrackSizeAvailable = { onAction(CreateRecordAction.OnTrackSizeAvailable(it)) }
             )
 
-            // TODO: Insert TopicsFlowRow
+            TopicsRow(
+                topics = state.topics,
+                addTopicText = state.addTopicText,
+                showCreateTopicOption = state.showCreateTopicOption,
+                showTopicSuggestions = state.showTopicSuggestions,
+                searchResults = state.searchResults,
+                onTopicClick = { onAction(CreateRecordAction.OnTopicClick(it)) },
+                onDismissTopicSuggestions = { onAction(CreateRecordAction.OnDismissTopicSuggestions) },
+                onRemoveTopicClick = { onAction(CreateRecordAction.OnRemoveTopicClick(it)) },
+                onAddTopicTextChange = { onAction(CreateRecordAction.OnAddTopicTextChange(it)) }
+            )
 
             Row(
                 modifier = Modifier
@@ -239,7 +250,7 @@ private fun CreateRecordContent(
             }
         }
 
-        if(state.showMoodSelector) {
+        if (state.showMoodSelector) {
             SelectMoodSheet(
                 selectedMood = state.selectedMood,
                 onMoodClick = {

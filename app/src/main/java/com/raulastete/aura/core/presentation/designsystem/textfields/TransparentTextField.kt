@@ -18,7 +18,7 @@ import com.raulastete.aura.core.presentation.designsystem.theme.AuraTheme
 fun TransparentTextField(
     text: String,
     onValueChange: (String) -> Unit,
-    hintText: String,
+    hintText: String?,
     modifier: Modifier = Modifier,
     hintColor: Color = MaterialTheme.colorScheme.outlineVariant,
     textStyle: TextStyle = MaterialTheme.typography.bodyMedium.copy(
@@ -42,7 +42,7 @@ fun TransparentTextField(
            Box(contentAlignment = Alignment.CenterStart){
                if (text.isBlank()) {
                    Text(
-                       text = hintText,
+                       text = hintText.orEmpty(),
                        style = textStyle,
                        color = hintColor
                    )
