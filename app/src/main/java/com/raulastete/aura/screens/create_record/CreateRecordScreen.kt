@@ -53,6 +53,7 @@ import com.raulastete.aura.core.presentation.designsystem.textfields.Transparent
 import com.raulastete.aura.core.presentation.designsystem.theme.AuraTheme
 import com.raulastete.aura.core.presentation.designsystem.theme.secondary70
 import com.raulastete.aura.core.presentation.designsystem.theme.secondary95
+import com.raulastete.aura.screens.create_record.components.SelectMoodSheet
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -236,6 +237,21 @@ private fun CreateRecordContent(
                     }
                 )
             }
+        }
+
+        if(state.showMoodSelector) {
+            SelectMoodSheet(
+                selectedMood = state.selectedMood,
+                onMoodClick = {
+                    onAction(CreateRecordAction.OnMoodClick(it))
+                },
+                onDismiss = {
+                    onAction(CreateRecordAction.OnDismissMoodSelector)
+                },
+                onConfirmClick = {
+                    onAction(CreateRecordAction.OnConfirmMood)
+                }
+            )
         }
     }
 }
