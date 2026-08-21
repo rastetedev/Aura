@@ -7,8 +7,11 @@ import androidx.navigation.toRoute
 import com.raulastete.aura.core.domain.recording.RecordingStorage
 import com.raulastete.aura.core.presentation.designsystem.dropdowns.asUnselectedItems
 import com.raulastete.aura.core.presentation.model.MoodUi
+import com.raulastete.aura.core.presentation.model.TrackSizeInfo
+import com.raulastete.aura.core.presentation.util.amplitude.AmplitudeNormalizer
 import com.raulastete.aura.navigation.NavigationRoute
 import com.raulastete.aura.navigation.toRecordingDetails
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -68,7 +71,7 @@ class CreateRecordViewModel(
             CreateRecordAction.OnSaveClick -> onSaveClick()
             is CreateRecordAction.OnTitleTextChange -> onTitleTextChange(action.text)
             is CreateRecordAction.OnTopicClick -> onTopicClick(action.topic)
-            is CreateRecordAction.OnTrackSizeAvailable -> TODO()
+            is CreateRecordAction.OnTrackSizeAvailable -> onTrackSizeAvailable(action.trackSizeInfo)
             CreateRecordAction.OnSelectMoodClick -> onSelectMoodClick()
             CreateRecordAction.OnDismissConfirmLeaveDialog -> onDismissConfirmLeaveDialog()
             CreateRecordAction.OnCancelClick,
@@ -76,6 +79,22 @@ class CreateRecordViewModel(
             CreateRecordAction.OnNavigateBackClick -> onShowConfirmLeaveDialog()
         }
     }
+
+    private fun onTrackSizeAvailable(trackSizeInfo: TrackSizeInfo) {
+        viewModelScope.launch(Dispatchers.Default) {
+            val finalAmplitudes = AmplitudeNormalizer.normalize(
+                sourceAmplitudes = recordingDetails.amplitudes,
+                trackWidth = trackSizeInfo.trackWidth,
+                barWidth = trackSizeInfo.barWidth,
+                spacing = trackSizeInfo.spacing
+            )
+
+            _state.update { it.copy(
+                playbackAmplitudes = finalAmplitudes
+            ) }
+        }
+    }
+
 
     private fun onConfirmMood() {
         _state.update {

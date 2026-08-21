@@ -15,7 +15,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.raulastete.aura.core.presentation.designsystem.theme.AuraTheme
 import com.raulastete.aura.core.presentation.designsystem.theme.MoodPrimary25
@@ -35,6 +38,8 @@ fun Player(
     state: PlaybackState,
     powerRatios: List<Float>,
     progress: () -> Float,
+    barSpacing: Dp = 2.dp,
+    barWidth: Dp = 5.dp,
     durationPlayed: Duration,
     totalPlaybackDuration : Duration,
     onPlayClick: () -> Unit,
@@ -42,6 +47,8 @@ fun Player(
     onTrackSizeAvailable: (TrackSizeInfo) -> Unit,
     modifier: Modifier = Modifier
 ) {
+
+    val density = LocalDensity.current
 
     val iconTint = when (moodUi) {
         null -> MoodPrimary80
@@ -84,13 +91,27 @@ fun Player(
             PlayBar(
                 powerRatios = powerRatios,
                 trackColor = trackColor,
+                barSpacing = barSpacing,
+                barWidth = barWidth,
                 trackFillColor = trackFillColor,
                 playerProgress = progress,
                 modifier = Modifier
                     .weight(1f)
                     .padding(vertical = 10.dp, horizontal = 8.dp)
                     .fillMaxHeight()
+                    .onSizeChanged {
+                        if(it.width > 0) {
+                            onTrackSizeAvailable(
+                                TrackSizeInfo(
+                                    trackWidth = it.width.toFloat(),
+                                    barWidth = with(density) { barWidth.toPx() },
+                                    spacing = with(density) { barSpacing.toPx() }
+                                )
+                            )
+                        }
+                    }
             )
+
             Text(
                 text = formattedDurationText,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,

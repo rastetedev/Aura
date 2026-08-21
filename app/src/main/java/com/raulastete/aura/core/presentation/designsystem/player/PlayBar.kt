@@ -19,27 +19,26 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.raulastete.aura.core.presentation.designsystem.theme.AuraTheme
 import com.raulastete.aura.core.presentation.model.MoodUi
 import kotlin.random.Random
 
-private const val AMPLITUDE_BAR_SPACING_DP = 2
-private const val POWER_RATIOS_SIZE = 35
-
 @Composable
 fun PlayBar(
     powerRatios: List<Float>,
     trackColor: Color,
+    barSpacing: Dp,
+    barWidth: Dp,
     trackFillColor: Color,
     playerProgress: () -> Float,
     modifier: Modifier = Modifier
 ) {
 
     Canvas(modifier = modifier) {
-        val amplitudeBarSpacingPx = AMPLITUDE_BAR_SPACING_DP.dp.toPx()
-        val amplitudeBarWidthPx =
-            (this.size.width - (amplitudeBarSpacingPx * POWER_RATIOS_SIZE - 1)) / powerRatios.size
+        val amplitudeBarSpacingPx = barSpacing.toPx()
+        val amplitudeBarWidthPx = barWidth.toPx()
 
         val clipPath = Path()
 
@@ -103,7 +102,9 @@ private fun PlayBarPreview() {
                 playerProgress = { 0.9f },
                 modifier = Modifier
                     .fillMaxWidth(0.4f)
-                    .height(20.dp)
+                    .height(20.dp),
+                barSpacing = 2.dp,
+                barWidth = 2.dp
             )
         }
     }

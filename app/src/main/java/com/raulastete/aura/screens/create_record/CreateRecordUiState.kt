@@ -17,7 +17,7 @@ data class CreateRecordUiState(
     val topics: List<String> = listOf(),
     val showCreateTopicOption: Boolean = true,
     val canSaveRecord: Boolean = false,
-    val playbackAmplitudes: List<Float> = List(32) { 0.3f },
+    val playbackAmplitudes: List<Float> = emptyList(),
     val playbackTotalDuration: Duration = Duration.ZERO,
     val playbackState: PlaybackState = PlaybackState.IDLE,
     val durationPlayed: Duration = Duration.ZERO,
