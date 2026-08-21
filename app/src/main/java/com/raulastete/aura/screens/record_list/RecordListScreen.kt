@@ -48,7 +48,6 @@ import com.raulastete.aura.screens.record_list.components.RecordingSheet
 import com.raulastete.aura.screens.record_list.model.AudioCaptureMethod
 import com.raulastete.aura.screens.record_list.model.RecordingState
 import org.koin.androidx.compose.koinViewModel
-import timber.log.Timber
 
 @Composable
 fun RecordListScreen(
@@ -102,7 +101,7 @@ fun RecordListScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RecordListContent(
+private fun RecordListContent(
     state: RecordListUiState,
     onSettingsClick: () -> Unit,
     onAction: (RecordListAction) -> Unit,

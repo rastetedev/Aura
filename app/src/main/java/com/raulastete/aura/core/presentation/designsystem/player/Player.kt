@@ -18,6 +18,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.raulastete.aura.core.presentation.designsystem.theme.AuraTheme
+import com.raulastete.aura.core.presentation.designsystem.theme.MoodPrimary25
+import com.raulastete.aura.core.presentation.designsystem.theme.MoodPrimary35
+import com.raulastete.aura.core.presentation.designsystem.theme.MoodPrimary80
 import com.raulastete.aura.core.presentation.model.MoodUi
 import com.raulastete.aura.core.presentation.model.PlaybackState
 import com.raulastete.aura.core.presentation.model.TrackSizeInfo
@@ -28,7 +31,7 @@ import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun Player(
-    moodUi: MoodUi,
+    moodUi: MoodUi?,
     state: PlaybackState,
     powerRatios: List<Float>,
     progress: () -> Float,
@@ -40,10 +43,22 @@ fun Player(
     modifier: Modifier = Modifier
 ) {
 
-    val iconTint = moodUi.colorSet.vivid
-    val trackFillColor = moodUi.colorSet.vivid
-    val backgroundColor = moodUi.colorSet.faded
-    val trackColor = moodUi.colorSet.desaturated
+    val iconTint = when (moodUi) {
+        null -> MoodPrimary80
+        else -> moodUi.colorSet.vivid
+    }
+    val trackFillColor = when (moodUi) {
+        null -> MoodPrimary80
+        else -> moodUi.colorSet.vivid
+    }
+    val backgroundColor = when (moodUi) {
+        null -> MoodPrimary25
+        else -> moodUi.colorSet.faded
+    }
+    val trackColor = when (moodUi) {
+        null -> MoodPrimary35
+        else -> moodUi.colorSet.desaturated
+    }
     val formattedDurationText = remember(durationPlayed, totalPlaybackDuration) {
         "${durationPlayed.formatMMSS()}/${totalPlaybackDuration.formatMMSS()}"
     }
@@ -92,7 +107,7 @@ private fun PlayerPreview() {
     AuraTheme {
         Player(
             modifier = Modifier.fillMaxWidth(),
-            moodUi = MoodUi.EXCITED,
+            moodUi = null,
             state = PlaybackState.PLAYING,
             powerRatios = powerRatios,
             progress = { 0.5f },
