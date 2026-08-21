@@ -1,5 +1,6 @@
 package com.raulastete.aura.screens.create_record
 
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -40,6 +41,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -56,6 +58,7 @@ import com.raulastete.aura.core.presentation.designsystem.textfields.Transparent
 import com.raulastete.aura.core.presentation.designsystem.theme.AuraTheme
 import com.raulastete.aura.core.presentation.designsystem.theme.secondary70
 import com.raulastete.aura.core.presentation.designsystem.theme.secondary95
+import com.raulastete.aura.core.presentation.util.lifecycle.ObserveAsEvents
 import com.raulastete.aura.screens.create_record.components.SelectMoodSheet
 import com.raulastete.aura.screens.create_record.components.TopicsRow
 import org.koin.androidx.compose.koinViewModel
@@ -66,6 +69,20 @@ fun CreateRecordScreen(
     onConfirmLeave: () -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+
+    val context = LocalContext.current
+    ObserveAsEvents(viewModel.events) { event ->
+        when(event) {
+            CreateRecordEvent.FailedToSaveFile -> {
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.error_couldnt_save_file),
+                    Toast.LENGTH_LONG
+                ).show()
+                onConfirmLeave()
+            }
+        }
+    }
 
     CreateRecordContent(
         state = state,

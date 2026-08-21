@@ -4,6 +4,7 @@ import android.content.Context
 import android.media.MediaRecorder
 import android.os.Build
 import com.raulastete.aura.core.domain.recording.RecordingDetails
+import com.raulastete.aura.core.domain.recording.RecordingStorage
 import com.raulastete.aura.core.domain.recording.VoiceRecorder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -147,7 +148,7 @@ class AndroidVoiceRecorder(
         val uniqueId = Uuid.random().toString()
         return File(
             context.cacheDir,
-            "temp_recording_$uniqueId.mp4"
+            "${RecordingStorage.TEMP_FILE_PREFIX}_$uniqueId.${RecordingStorage.RECORDING_FILE_EXTENSION}"
         )
     }
 
