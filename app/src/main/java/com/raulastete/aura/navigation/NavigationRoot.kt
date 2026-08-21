@@ -24,7 +24,9 @@ fun NavigationRoot(
             )
         }
         composable<NavigationRoute.CreateRecord> {
-            CreateRecordScreen()
+            CreateRecordScreen(
+                onConfirmLeave = navController::navigateUp
+            )
         }
     }
 }

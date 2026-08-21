@@ -1,5 +1,6 @@
 package com.raulastete.aura.screens.create_record
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -19,6 +20,7 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Create
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconButton
@@ -28,6 +30,7 @@ import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -59,13 +62,15 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun CreateRecordScreen(
-    viewModel: CreateRecordViewModel = koinViewModel()
+    viewModel: CreateRecordViewModel = koinViewModel(),
+    onConfirmLeave: () -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     CreateRecordContent(
         state = state,
-        onAction = viewModel::onAction
+        onAction = viewModel::onAction,
+        onConfirmLeave = onConfirmLeave
     )
 }
 
@@ -73,8 +78,14 @@ fun CreateRecordScreen(
 @Composable
 private fun CreateRecordContent(
     state: CreateRecordUiState,
+    onConfirmLeave: () -> Unit,
     onAction: (CreateRecordAction) -> Unit,
 ) {
+
+    BackHandler(enabled = !state.showConfirmLeaveDialog) {
+        onAction(CreateRecordAction.OnGoBack)
+    }
+
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
@@ -253,15 +264,30 @@ private fun CreateRecordContent(
         if (state.showMoodSelector) {
             SelectMoodSheet(
                 selectedMood = state.selectedMood,
-                onMoodClick = {
-                    onAction(CreateRecordAction.OnMoodClick(it))
+                onMoodClick = { onAction(CreateRecordAction.OnMoodClick(it)) },
+                onDismiss = { onAction(CreateRecordAction.OnDismissMoodSelector) },
+                onConfirmClick = { onAction(CreateRecordAction.OnConfirmMood) }
+            )
+        }
+
+        if (state.showConfirmLeaveDialog) {
+            AlertDialog(
+                onDismissRequest = { onAction(CreateRecordAction.OnDismissConfirmLeaveDialog) },
+                confirmButton = {
+                    TextButton(onClick = onConfirmLeave) {
+                        Text(
+                            text = stringResource(R.string.discard),
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
                 },
-                onDismiss = {
-                    onAction(CreateRecordAction.OnDismissMoodSelector)
+                dismissButton = {
+                    TextButton(onClick = { onAction(CreateRecordAction.OnDismissConfirmLeaveDialog) }) {
+                        Text(text = stringResource(R.string.cancel))
+                    }
                 },
-                onConfirmClick = {
-                    onAction(CreateRecordAction.OnConfirmMood)
-                }
+                title = { Text(text = stringResource(R.string.discard_recording)) },
+                text = { Text(text = stringResource(R.string.this_cannot_be_undone)) }
             )
         }
     }
@@ -273,7 +299,8 @@ private fun Preview() {
     AuraTheme {
         CreateRecordContent(
             state = CreateRecordUiState(),
-            onAction = {}
+            onAction = {},
+            onConfirmLeave = {}
         )
     }
 }
