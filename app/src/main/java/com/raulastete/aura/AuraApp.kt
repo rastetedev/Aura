@@ -1,6 +1,7 @@
 package com.raulastete.aura
 
 import android.app.Application
+import com.raulastete.aura.core.database.databaseModule
 import com.raulastete.aura.screens.create_record.createRecordModule
 import com.raulastete.aura.screens.record_list.recordListModule
 import kotlinx.coroutines.CoroutineScope
@@ -24,7 +25,7 @@ class AuraApp : Application() {
         startKoin {
             androidContext(this@AuraApp)
             modules(
-                appModule, recordListModule, createRecordModule
+                appModule, recordListModule, createRecordModule, databaseModule
             )
         }
     }
