@@ -54,15 +54,20 @@ class CreateRecordViewModel(
 
     private val _state = MutableStateFlow(
         CreateRecordUiState(
-            playbackTotalDuration = recordingDetails.duration,
-            title = savedStateHandle["title"] ?: "",
-            note = savedStateHandle["note"] ?: "",
-            topics = restoredTopics ?: emptyList(),
-            mood = savedStateHandle.get<String>("mood")?.let {
-                MoodUi.valueOf(it)
-            },
-            showMoodSelector = savedStateHandle.get<String>("mood") == null,
-            canSaveRecord = savedStateHandle.get<Boolean>("canSaveRecord") == true
+            form = FormUiState(
+                title = savedStateHandle["title"] ?: "",
+                note = savedStateHandle["note"] ?: "",
+                topics = restoredTopics ?: emptyList(),
+                mood = savedStateHandle.get<String>("mood")?.let {
+                    MoodUi.valueOf(it)
+                },
+            ),
+            playerUiState = PlayerUiState(
+                playbackTotalDuration = recordingDetails.duration,
+            ),
+            moodSheerUiState = MoodSheerUiState(
+                showMoodSelector = savedStateHandle.get<String>("mood") == null,
+            ),
         )
     )
     val state = _state
@@ -72,11 +77,12 @@ class CreateRecordViewModel(
                 hasLoadedInitialData = true
             }
         }.onEach { state ->
-            savedStateHandle["title"] = state.title
-            savedStateHandle["note"] = state.note
-            savedStateHandle["topics"] = state.topics.joinToString(",")
-            savedStateHandle["mood"] = state.mood?.name
-            savedStateHandle["canSaveRecord"] = state.canSaveRecord
+            savedStateHandle.apply {
+                set("title", state.form.title)
+                set("note", state.form.note)
+                set("topics", state.form.topics.joinToString(","))
+                set("mood", state.form.mood?.name)
+            }
         }
         .stateIn(
             scope = viewModelScope,
@@ -90,7 +96,7 @@ class CreateRecordViewModel(
             CreateRecordAction.OnConfirmMood -> onConfirmMood()
             CreateRecordAction.OnDismissMoodSelector -> onDismissMoodSelector()
             CreateRecordAction.OnDismissTopicSuggestions -> onDismissTopicSuggestions()
-            is CreateRecordAction.OnMoodClick -> onMoodClick(action.moodUi)
+            is CreateRecordAction.OnMoodClick -> onMoodClickInSheet(action.moodUi)
             is CreateRecordAction.OnNoteTextChange ->  onNoteTextChange(action.text)
             CreateRecordAction.OnPauseAudioClick -> audioPlayer.pause()
             CreateRecordAction.OnPlayAudioClick -> onPlayAudioClick()
@@ -99,7 +105,7 @@ class CreateRecordViewModel(
             is CreateRecordAction.OnTitleTextChange -> onTitleTextChange(action.text)
             is CreateRecordAction.OnTopicClick -> onTopicClick(action.topic)
             is CreateRecordAction.OnTrackSizeAvailable -> onTrackSizeAvailable(action.trackSizeInfo)
-            CreateRecordAction.OnSelectMoodClick -> onSelectMoodClick()
+            CreateRecordAction.OnSelectMoodClick -> onMoodClick()
             CreateRecordAction.OnDismissConfirmLeaveDialog -> onDismissConfirmLeaveDialog()
             CreateRecordAction.OnCancelClick,
             CreateRecordAction.OnGoBack,
@@ -118,7 +124,9 @@ class CreateRecordViewModel(
 
             _state.update {
                 it.copy(
-                    playbackAmplitudes = finalAmplitudes
+                    playerUiState = it.playerUiState.copy(
+                        playbackAmplitudes = finalAmplitudes
+                    )
                 )
             }
         }
@@ -126,47 +134,65 @@ class CreateRecordViewModel(
 
 
     private fun onConfirmMood() {
+
         _state.update {
             it.copy(
-                mood = it.selectedMood,
-                canSaveRecord = it.title.isNotBlank(),
-                showMoodSelector = false
+                moodSheerUiState = it.moodSheerUiState.copy(
+                    showMoodSelector = false
+                ),
+                form = it.form.copy(
+                    mood = it.moodSheerUiState.selectedMood
+                ),
             )
         }
     }
 
     private fun onDismissMoodSelector() {
         _state.update {
-            it.copy(showMoodSelector = false)
+            it.copy(
+                moodSheerUiState = it.moodSheerUiState.copy(
+                    showMoodSelector = false
+                ),
+            )
         }
     }
 
-    private fun onSelectMoodClick() {
+    private fun onMoodClick() {
         _state.update {
-            it.copy(showMoodSelector = true)
+            it.copy(
+                moodSheerUiState = it.moodSheerUiState.copy(
+                    showMoodSelector = true
+                ),
+            )
         }
     }
 
-    private fun onMoodClick(mood: MoodUi) {
+    private fun onMoodClickInSheet(mood: MoodUi) {
         _state.update {
-            it.copy(selectedMood = mood)
+            it.copy(
+                moodSheerUiState = it.moodSheerUiState.copy(
+                    selectedMood = mood
+                ),
+            )
         }
     }
 
     @OptIn(FlowPreview::class)
     private fun observeAddTopicText() {
         state
-            .map { it.addTopicText }
+            .map { it.topicPopupUiState.addTopicText }
             .distinctUntilChanged()
             .debounce(300.milliseconds)
             .onEach { query ->
                 _state.update {
                     it.copy(
-                        showTopicSuggestions = query.isNotBlank() && query.trim() !in it.topics,
-                        searchResults = listOf(
-                            "hello",
-                            "helloworld",
-                        ).asUnselectedItems()
+                        topicPopupUiState = it.topicPopupUiState.copy(
+                            showTopicSuggestions = query.isNotBlank() && query.trim() !in it.form.topics,
+                            searchResults = listOf(
+                                "hello",
+                                "helloworld",
+                            ).asUnselectedItems()
+                        ),
                     )
                 }
             }
@@ -175,21 +201,33 @@ class CreateRecordViewModel(
 
     private fun onDismissTopicSuggestions() {
         _state.update {
-            it.copy(showTopicSuggestions = false)
+            it.copy(
+                topicPopupUiState = it.topicPopupUiState.copy(
+                    showTopicSuggestions = false
+                )
+            )
         }
     }
 
     private fun onRemoveTopicClick(topic: String) {
         _state.update {
-            it.copy(topics = it.topics - topic)
+            it.copy(
+                form = it.form.copy(
+                    topics = it.form.topics - topic
+                )
+            )
         }
     }
 
     private fun onTopicClick(topic: String) {
         _state.update {
             it.copy(
-                addTopicText = "",
-                topics = (it.topics + topic).distinct()
+                form = it.form.copy(
+                    topics = (it.form.topics + topic).distinct()
+                ),
+                topicPopupUiState = it.topicPopupUiState.copy(
+                    addTopicText = ""
+                )
             )
         }
     }
@@ -197,9 +235,11 @@ class CreateRecordViewModel(
     private fun onAddTopicTextChange(text: String) {
         _state.update {
             it.copy(
-                addTopicText = text.filter { char ->
-                    char.isLetterOrDigit()
-                }
+                topicPopupUiState = it.topicPopupUiState.copy(
+                    addTopicText = text.filter { char ->
+                        char.isLetterOrDigit()
+                    }
+                )
             )
         }
     }
@@ -219,16 +259,21 @@ class CreateRecordViewModel(
     private fun onTitleTextChange(text: String) {
         _state.update {
             it.copy(
-                title = text,
-                canSaveRecord = text.isNotBlank() && it.mood != null
+                form = it.form.copy(
+                    title = text
+                )
             )
         }
     }
 
     private fun onNoteTextChange(text: String) {
-        _state.update { it.copy(
-            note = text
-        ) }
+        _state.update {
+            it.copy(
+                form = it.form.copy(
+                    note = text
+                )
+            )
+        }
     }
 
     private fun onSaveClick() {
@@ -250,7 +295,7 @@ class CreateRecordViewModel(
     }
 
     private fun onPlayAudioClick() {
-        if(state.value.playbackState == PlaybackState.PAUSED) {
+        if (state.value.playerUiState.playbackState == PlaybackState.PAUSED) {
             audioPlayer.resume()
         } else {
             audioPlayer.play(
@@ -258,10 +303,14 @@ class CreateRecordViewModel(
                     "File path can't be null"
                 ),
                 onComplete = {
-                    _state.update { it.copy(
-                        playbackState = PlaybackState.IDLE,
-                        durationPlayed = Duration.ZERO
-                    ) }
+                    _state.update {
+                        it.copy(
+                            playerUiState = it.playerUiState.copy(
+                                playbackState = PlaybackState.IDLE,
+                                durationPlayed = Duration.ZERO
+                            )
+                        )
+                    }
                 }
             )
 
@@ -269,10 +318,15 @@ class CreateRecordViewModel(
                 .activeTrack
                 .filterNotNull()
                 .onEach { track ->
-                    _state.update { it.copy(
-                        playbackState = if(track.isPlaying) PlaybackState.PLAYING else PlaybackState.PAUSED,
-                        durationPlayed = track.durationPlayed
-                    ) }
+                    _state.update {
+                        it.copy(
+                            playerUiState = it.playerUiState.copy(
+                                playbackState = if (track.isPlaying) PlaybackState.PLAYING
+                                else PlaybackState.PAUSED,
+                                durationPlayed = track.durationPlayed
+                            ),
+                        )
+                    }
                 }
                 .launchIn(viewModelScope)
         }

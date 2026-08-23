@@ -69,10 +69,10 @@ fun CreateRecordScreen(
     onConfirmLeave: () -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-
     val context = LocalContext.current
+
     ObserveAsEvents(viewModel.events) { event ->
-        when(event) {
+        when (event) {
             CreateRecordEvent.FailedToSaveFile -> {
                 Toast.makeText(
                     context,
@@ -145,7 +145,7 @@ private fun CreateRecordContent(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                if (state.mood == null) {
+                if (state.form.mood == null) {
                     FilledIconButton(
                         onClick = {
                             onAction(CreateRecordAction.OnSelectMoodClick)
@@ -162,8 +162,8 @@ private fun CreateRecordContent(
                     }
                 } else {
                     Image(
-                        imageVector = ImageVector.vectorResource(state.mood.iconSet.fill),
-                        contentDescription = state.mood.title.asString(),
+                        imageVector = ImageVector.vectorResource(state.form.mood.iconSet.fill),
+                        contentDescription = state.form.mood.title.asString(),
                         modifier = Modifier
                             .height(32.dp)
                             .clickable {
@@ -174,7 +174,7 @@ private fun CreateRecordContent(
                 }
 
                 TransparentTextField(
-                    text = state.title,
+                    text = state.form.title,
                     onValueChange = { onAction(CreateRecordAction.OnTitleTextChange(it)) },
                     modifier = Modifier
                         .weight(1f),
@@ -195,23 +195,23 @@ private fun CreateRecordContent(
             }
 
             Player(
-                moodUi = state.mood,
-                state = state.playbackState,
-                progress = { state.durationPlayedRatio },
-                durationPlayed = state.durationPlayed,
-                totalPlaybackDuration = state.playbackTotalDuration,
-                powerRatios = state.playbackAmplitudes,
+                moodUi = state.form.mood,
+                state = state.playerUiState.playbackState,
+                progress = { state.playerUiState.durationPlayedRatio },
+                durationPlayed = state.playerUiState.durationPlayed,
+                totalPlaybackDuration = state.playerUiState.playbackTotalDuration,
+                powerRatios = state.playerUiState.playbackAmplitudes,
                 onPlayClick = { onAction(CreateRecordAction.OnPlayAudioClick) },
                 onPauseClick = { onAction(CreateRecordAction.OnPauseAudioClick) },
                 onTrackSizeAvailable = { onAction(CreateRecordAction.OnTrackSizeAvailable(it)) }
             )
 
             TopicsRow(
-                topics = state.topics,
-                addTopicText = state.addTopicText,
-                showCreateTopicOption = state.showCreateTopicOption,
-                showTopicSuggestions = state.showTopicSuggestions,
-                searchResults = state.searchResults,
+                topics = state.form.topics,
+                addTopicText = state.topicPopupUiState.addTopicText,
+                showCreateTopicOption = true,
+                showTopicSuggestions = state.topicPopupUiState.showTopicSuggestions,
+                searchResults = state.topicPopupUiState.searchResults,
                 onTopicClick = { onAction(CreateRecordAction.OnTopicClick(it)) },
                 onDismissTopicSuggestions = { onAction(CreateRecordAction.OnDismissTopicSuggestions) },
                 onRemoveTopicClick = { onAction(CreateRecordAction.OnRemoveTopicClick(it)) },
@@ -231,7 +231,7 @@ private fun CreateRecordContent(
                     modifier = Modifier.size(16.dp)
                 )
                 TransparentTextField(
-                    text = state.note,
+                    text = state.form.note,
                     onValueChange = { onAction(CreateRecordAction.OnNoteTextChange(it)) },
                     modifier = Modifier
                         .weight(1f)
@@ -265,7 +265,7 @@ private fun CreateRecordContent(
                         onAction(CreateRecordAction.OnSaveClick)
                     },
                     modifier = Modifier.weight(1f),
-                    enabled = state.canSaveRecord,
+                    enabled = state.form.canSaveRecord,
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.Check,
@@ -278,9 +278,9 @@ private fun CreateRecordContent(
             }
         }
 
-        if (state.showMoodSelector) {
+        if (state.moodSheerUiState.showMoodSelector) {
             SelectMoodSheet(
-                selectedMood = state.selectedMood,
+                selectedMood = state.moodSheerUiState.selectedMood,
                 onMoodClick = { onAction(CreateRecordAction.OnMoodClick(it)) },
                 onDismiss = { onAction(CreateRecordAction.OnDismissMoodSelector) },
                 onConfirmClick = { onAction(CreateRecordAction.OnConfirmMood) }
