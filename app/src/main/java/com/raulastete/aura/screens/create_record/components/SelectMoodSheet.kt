@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import com.raulastete.aura.R
 import com.raulastete.aura.core.presentation.designsystem.buttons.PrimaryButton
 import com.raulastete.aura.core.presentation.designsystem.buttons.SecondaryButton
+import com.raulastete.aura.core.presentation.designsystem.mood.MoodSelectorRow
 import com.raulastete.aura.core.presentation.model.MoodUi
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -57,20 +58,11 @@ fun SelectMoodSheet(
                 style = MaterialTheme.typography.titleMedium
             )
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .horizontalScroll(rememberScrollState()),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                allMoods.forEach { mood ->
-                    MoodItem(
-                        selected = mood == selectedMood,
-                        mood = mood,
-                        onClick = { onMoodClick(mood) },
-                    )
-                }
-            }
+            MoodSelectorRow(
+                selectedMood = selectedMood,
+                onMoodClick = onMoodClick,
+                modifier = Modifier.fillMaxWidth()
+            )
 
             Row(
                 modifier = Modifier

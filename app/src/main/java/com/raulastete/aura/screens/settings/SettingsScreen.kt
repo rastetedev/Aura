@@ -27,6 +27,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.raulastete.aura.R
 import com.raulastete.aura.core.presentation.designsystem.theme.AuraTheme
 import com.raulastete.aura.core.presentation.designsystem.theme.bgGradient
+import com.raulastete.aura.screens.settings.components.MoodCard
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -92,7 +93,10 @@ fun SettingsContent(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-
+            MoodCard(
+                selectedMood = state.selectedMood,
+                onMoodClick = { onAction(SettingsAction.OnMoodClick(it)) }
+            )
         }
     }
 }

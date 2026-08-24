@@ -9,6 +9,7 @@ import com.raulastete.aura.core.domain.record.Mood
 import com.raulastete.aura.core.domain.record.Record
 import com.raulastete.aura.core.domain.record.RecordDataSource
 import com.raulastete.aura.core.domain.recording.RecordingStorage
+import com.raulastete.aura.core.domain.settings.SettingsPreferences
 import com.raulastete.aura.core.presentation.designsystem.dropdowns.asUnselectedItems
 import com.raulastete.aura.core.presentation.model.MoodUi
 import com.raulastete.aura.core.presentation.model.PlaybackState
@@ -31,6 +32,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.Instant
@@ -41,7 +43,8 @@ class CreateRecordViewModel(
     private val savedStateHandle: SavedStateHandle,
     private val recordingStorage: RecordingStorage,
     private val audioPlayer: AudioPlayer,
-    private val recordDataSource: RecordDataSource
+    private val recordDataSource: RecordDataSource,
+    private val settingsPreferences: SettingsPreferences
 ) : ViewModel() {
 
     private var hasLoadedInitialData = false
@@ -79,6 +82,7 @@ class CreateRecordViewModel(
         .onStart {
             if (!hasLoadedInitialData) {
                 observeAddTopicText()
+                fetchDefaultSettings()
                 hasLoadedInitialData = true
             }
         }.onEach { state ->
@@ -116,6 +120,27 @@ class CreateRecordViewModel(
             CreateRecordAction.OnGoBack,
             CreateRecordAction.OnNavigateBackClick -> onShowConfirmLeaveDialog()
         }
+    }
+
+    private fun fetchDefaultSettings() {
+        settingsPreferences
+            .observeDefaultMood()
+            .take(1)
+            .onEach { defaultMood ->
+                val moodUi = MoodUi.valueOf(defaultMood.name)
+                _state.update {
+                    it.copy(
+                        moodSheerUiState = it.moodSheerUiState.copy(
+                            selectedMood = moodUi,
+                            showMoodSelector = false
+                        ),
+                        form = it.form.copy(
+                            mood = moodUi
+                        ),
+                    )
+                }
+            }
+            .launchIn(viewModelScope)
     }
 
     private fun onTrackSizeAvailable(trackSizeInfo: TrackSizeInfo) {
