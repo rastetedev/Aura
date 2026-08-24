@@ -1,7 +1,9 @@
 package com.raulastete.aura
 
 import com.raulastete.aura.core.data.audio.AndroidAudioPlayer
+import com.raulastete.aura.core.data.record.RoomRecordDataSource
 import com.raulastete.aura.core.domain.audio.AudioPlayer
+import com.raulastete.aura.core.domain.record.RecordDataSource
 import kotlinx.coroutines.CoroutineScope
 import org.koin.android.ext.koin.androidApplication
 import org.koin.core.module.dsl.singleOf
@@ -14,4 +16,6 @@ val appModule = module {
     }
 
     singleOf(::AndroidAudioPlayer) bind AudioPlayer::class
+
+    singleOf(::RoomRecordDataSource) bind RecordDataSource::class
 }
