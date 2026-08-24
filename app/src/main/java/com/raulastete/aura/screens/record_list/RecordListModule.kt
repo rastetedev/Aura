@@ -2,6 +2,7 @@ package com.raulastete.aura.screens.record_list
 
 import com.raulastete.aura.core.data.recording.AndroidVoiceRecorder
 import com.raulastete.aura.core.domain.recording.VoiceRecorder
+import com.raulastete.aura.screens.settings.SettingsViewModel
 import org.koin.android.ext.koin.androidApplication
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.bind
@@ -16,4 +17,5 @@ val recordListModule = module {
     } bind VoiceRecorder::class
 
     viewModelOf(::RecordListViewModel)
+    viewModelOf(::SettingsViewModel)
 }

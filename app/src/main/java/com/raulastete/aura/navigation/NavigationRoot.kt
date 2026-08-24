@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.raulastete.aura.screens.create_record.CreateRecordScreen
 import com.raulastete.aura.screens.record_list.RecordListScreen
+import com.raulastete.aura.screens.settings.SettingsScreen
 
 
 @Composable
@@ -20,12 +21,20 @@ fun NavigationRoot(
             RecordListScreen(
                 onNavigateToCreateRecord = { details ->
                     navController.navigate(details.toCreateRecordRoute())
+                },
+                onNavigateToSettings = {
+                    navController.navigate(NavigationRoute.Settings)
                 }
             )
         }
         composable<NavigationRoute.CreateRecord> {
             CreateRecordScreen(
                 onConfirmLeave = navController::navigateUp
+            )
+        }
+        composable<NavigationRoute.Settings> {
+            SettingsScreen(
+                onGoBack = navController::navigateUp
             )
         }
     }

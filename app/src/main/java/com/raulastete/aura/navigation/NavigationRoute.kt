@@ -14,6 +14,9 @@ sealed interface NavigationRoute {
         val duration: Long,
         val amplitudes: String
     ): NavigationRoute
+
+    @Serializable
+    data object Settings: NavigationRoute
 }
 
 fun RecordingDetails.toCreateRecordRoute(): NavigationRoute.CreateRecord {

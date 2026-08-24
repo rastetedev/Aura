@@ -53,6 +53,7 @@ import org.koin.androidx.compose.koinViewModel
 fun RecordListScreen(
     viewModel: RecordListViewModel = koinViewModel(),
     onNavigateToCreateRecord: (RecordingDetails) -> Unit,
+    onNavigateToSettings: () -> Unit
 ) {
     val context = LocalContext.current
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -94,7 +95,7 @@ fun RecordListScreen(
 
     RecordListContent(
         state = state,
-        onSettingsClick = {},
+        onSettingsClick = onNavigateToSettings,
         onAction = viewModel::onAction
     )
 }
