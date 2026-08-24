@@ -141,6 +141,20 @@ class CreateRecordViewModel(
                 }
             }
             .launchIn(viewModelScope)
+
+        settingsPreferences
+            .observeDefaultTopics()
+            .take(1)
+            .onEach { defaultTopics ->
+                _state.update {
+                    it.copy(
+                        form = it.form.copy(
+                            topics = defaultTopics
+                        )
+                    )
+                }
+            }
+            .launchIn(viewModelScope)
     }
 
     private fun onTrackSizeAvailable(trackSizeInfo: TrackSizeInfo) {
