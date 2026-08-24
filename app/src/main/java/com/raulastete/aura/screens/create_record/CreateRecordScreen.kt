@@ -81,6 +81,9 @@ fun CreateRecordScreen(
                 ).show()
                 onConfirmLeave()
             }
+            CreateRecordEvent.RecordSuccessfullySaved -> {
+                onConfirmLeave()
+            }
         }
     }
 

@@ -5,6 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.raulastete.aura.core.domain.audio.AudioPlayer
+import com.raulastete.aura.core.domain.record.Mood
+import com.raulastete.aura.core.domain.record.Record
+import com.raulastete.aura.core.domain.record.RecordDataSource
 import com.raulastete.aura.core.domain.recording.RecordingStorage
 import com.raulastete.aura.core.presentation.designsystem.dropdowns.asUnselectedItems
 import com.raulastete.aura.core.presentation.model.MoodUi
@@ -30,13 +33,15 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.Instant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
 class CreateRecordViewModel(
     private val savedStateHandle: SavedStateHandle,
     private val recordingStorage: RecordingStorage,
-    private val audioPlayer: AudioPlayer
+    private val audioPlayer: AudioPlayer,
+    private val recordDataSource: RecordDataSource
 ) : ViewModel() {
 
     private var hasLoadedInitialData = false
@@ -97,7 +102,7 @@ class CreateRecordViewModel(
             CreateRecordAction.OnDismissMoodSelector -> onDismissMoodSelector()
             CreateRecordAction.OnDismissTopicSuggestions -> onDismissTopicSuggestions()
             is CreateRecordAction.OnMoodClick -> onMoodClickInSheet(action.moodUi)
-            is CreateRecordAction.OnNoteTextChange ->  onNoteTextChange(action.text)
+            is CreateRecordAction.OnNoteTextChange -> onNoteTextChange(action.text)
             CreateRecordAction.OnPauseAudioClick -> audioPlayer.pause()
             CreateRecordAction.OnPlayAudioClick -> onPlayAudioClick()
             is CreateRecordAction.OnRemoveTopicClick -> onRemoveTopicClick(action.topic)
@@ -277,7 +282,7 @@ class CreateRecordViewModel(
     }
 
     private fun onSaveClick() {
-        if (recordingDetails.filePath == null) {
+        if (recordingDetails.filePath == null || state.value.form.canSaveRecord.not()) {
             return
         }
 
@@ -290,7 +295,23 @@ class CreateRecordViewModel(
                 return@launch
             }
 
-            // TODO: Echo
+            val currentState = state.value
+
+            val record = Record(
+                mood = currentState.form.mood?.let {
+                    Mood.valueOf(it.name)
+                } ?: throw IllegalStateException("Mood must be set before saving record"),
+                title = currentState.form.title.trim(),
+                note = currentState.form.note.ifBlank { null },
+                topics = currentState.form.topics,
+                audioFilePath = savedFilePath,
+                audioPlaybackLength = currentState.playerUiState.playbackTotalDuration,
+                audioAmplitudes = recordingDetails.amplitudes,
+                recordedAt = Instant.now()
+            )
+
+            recordDataSource.insertRecord(record)
+            eventChannel.send(CreateRecordEvent.RecordSuccessfullySaved)
         }
     }
 
