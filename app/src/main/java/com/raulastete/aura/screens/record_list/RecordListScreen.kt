@@ -223,7 +223,7 @@ private fun RecordListContent(
                                 .align(Alignment.CenterHorizontally),
                             recordSections = state.recordSections,
                             onPlayClick = { onAction(RecordListAction.OnPlayClick(it)) },
-                            onPauseClick = { onAction(RecordListAction.OnPauseRecordingClick) },
+                            onPauseClick = { onAction(RecordListAction.OnPauseAudioClick) },
                             onTrackSizeAvailable = {
                                 onAction(
                                     RecordListAction.OnTrackSizeAvailable(

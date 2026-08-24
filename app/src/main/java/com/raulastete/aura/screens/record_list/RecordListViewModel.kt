@@ -36,6 +36,7 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import kotlin.time.Duration
+import com.raulastete.aura.core.domain.record.Record
 
 class RecordListViewModel(
     private val voiceRecorder: VoiceRecorder,
@@ -68,8 +69,9 @@ class RecordListViewModel(
     private val eventChannel = Channel<RecordListEvent>()
     val events = eventChannel.receiveAsFlow()
 
-    private val records = recordDataSource
+    private val filteredRecords = recordDataSource
         .observeRecords()
+        .filterByMoodAndTopics()
         .onEach {
             _state.update {
                 it.copy(isLoadingData = false)
@@ -132,7 +134,7 @@ class RecordListViewModel(
 
     private fun observeRecords() {
         combine(
-            records,
+            filteredRecords,
             playingEchoId,
             audioPlayer.activeTrack
         ) { records, playingEchoId, activeTrack ->
@@ -164,8 +166,8 @@ class RecordListViewModel(
     private fun Flow<List<RecordUi>>.groupByRelativeDate(): Flow<Map<UiText, List<RecordUi>>> {
         val formatter = DateTimeFormatter.ofPattern("dd MMM")
         val today = LocalDate.now()
-        return map { echos ->
-            echos
+        return map { recordUis ->
+            recordUis
                 .groupBy { echo ->
                     LocalDate.ofInstant(
                         echo.recordedAt,
@@ -186,6 +188,29 @@ class RecordListViewModel(
         }
     }
 
+    private fun Flow<List<Record>>.filterByMoodAndTopics(): Flow<List<Record>> {
+        return combine(
+            this,
+            selectedMoodFilters,
+            selectedTopicFilters
+        ) { records, moodFilters, topicFilters ->
+            records.filter { record ->
+                val matchesMoodFilter = moodFilters
+                    .takeIf { it.isNotEmpty() }
+                    ?.any { it.name == record.mood.name }
+                    ?: true
+
+                val matchesTopicFilter = topicFilters
+                    .takeIf { it.isNotEmpty() }
+                    ?.any { it in record.topics }
+                    ?: true
+
+                matchesMoodFilter && matchesTopicFilter
+            }
+
+        }
+    }
+
     private fun removeFilters(recordFilterDropdown: RecordFilterDropdown) {
         when (recordFilterDropdown) {
             RecordFilterDropdown.MOOD -> selectedMoodFilters.update { emptyList() }
@@ -195,15 +220,16 @@ class RecordListViewModel(
 
     private fun observeFilters() {
         combine(
+            recordDataSource.observeTopics(),
             selectedTopicFilters,
             selectedMoodFilters,
-        ) { selectedTopics, selectedMoods ->
+        ) {allTopics, selectedTopics, selectedMoods ->
             _state.update {
                 it.copy(
-                    topicFilterList = it.topicFilterList.map { selectableTopic ->
+                    topicFilterList = allTopics.map { topic ->
                         Selectable(
-                            item = selectableTopic.item,
-                            selected = selectedTopics.contains(selectableTopic.item)
+                            item = topic,
+                            selected = selectedTopics.contains(topic)
                         )
                     },
                     moodFilterList = MoodUi.entries.map { moodUi ->
