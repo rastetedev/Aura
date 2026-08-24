@@ -1,5 +1,6 @@
 package com.raulastete.aura.core.presentation.model
 
+import com.raulastete.aura.core.domain.record.Record
 import com.raulastete.aura.core.presentation.util.string.formatHHmm
 import java.time.Instant
 import kotlin.time.Duration
@@ -19,4 +20,23 @@ data class RecordUi(
 ){
     val formattedRecordedAt = recordedAt.formatHHmm()
     val playbackRatio = playbackCurrentDuration.div(playbackTotalDuration).toFloat()
+}
+
+fun Record.toRecordUi(
+    currentPlaybackDuration: Duration = Duration.ZERO,
+    playbackState: PlaybackState = PlaybackState.IDLE
+): RecordUi {
+    return RecordUi(
+        id = id!!,
+        title = title,
+        mood = MoodUi.valueOf(mood.name),
+        recordedAt = recordedAt,
+        note = note,
+        topics = topics,
+        amplitudes = audioAmplitudes,
+        playbackTotalDuration = audioPlaybackLength,
+        audioFilePath = audioFilePath,
+        playbackCurrentDuration = currentPlaybackDuration,
+        playbackState = playbackState
+    )
 }

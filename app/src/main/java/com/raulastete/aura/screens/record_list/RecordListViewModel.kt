@@ -4,43 +4,92 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.raulastete.aura.R
 import com.raulastete.aura.core.domain.audio.AudioPlayer
+import com.raulastete.aura.core.domain.record.RecordDataSource
 import com.raulastete.aura.core.domain.recording.VoiceRecorder
 import com.raulastete.aura.core.presentation.designsystem.dropdowns.Selectable
 import com.raulastete.aura.core.presentation.model.MoodUi
+import com.raulastete.aura.core.presentation.model.PlaybackState
+import com.raulastete.aura.core.presentation.model.RecordUi
+import com.raulastete.aura.core.presentation.model.TrackSizeInfo
+import com.raulastete.aura.core.presentation.model.toRecordUi
+import com.raulastete.aura.core.presentation.util.amplitude.AmplitudeNormalizer
 import com.raulastete.aura.core.presentation.util.string.UiText
 import com.raulastete.aura.screens.record_list.model.AudioCaptureMethod
 import com.raulastete.aura.screens.record_list.model.RecordingState
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChangedBy
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import kotlin.time.Duration
 
 class RecordListViewModel(
     private val voiceRecorder: VoiceRecorder,
     private val audioPlayer: AudioPlayer,
+    private val recordDataSource: RecordDataSource
 ) : ViewModel() {
+
+    private var hasLoadedInitialData = false
 
     private val playingEchoId = MutableStateFlow<Int?>(null)
     private val selectedMoodFilters = MutableStateFlow<List<MoodUi>>(emptyList())
     private val selectedTopicFilters = MutableStateFlow<List<String>>(emptyList())
+    private val audioTrackSizeInfo = MutableStateFlow<TrackSizeInfo?>(null)
 
     private val _state = MutableStateFlow(RecordListUiState())
-    val state = _state.asStateFlow()
+    val state = _state
+        .onStart {
+            if (!hasLoadedInitialData) {
+                observeFilters()
+                observeRecords()
+                hasLoadedInitialData = true
+            }
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000L),
+            initialValue = RecordListUiState()
+        )
 
     private val eventChannel = Channel<RecordListEvent>()
     val events = eventChannel.receiveAsFlow()
 
-    init {
-        observeFilters()
-    }
+    private val records = recordDataSource
+        .observeRecords()
+        .onEach {
+            _state.update {
+                it.copy(isLoadingData = false)
+            }
+        }
+        .combine(audioTrackSizeInfo) { records, trackSizeInfo ->
+            if (trackSizeInfo != null) {
+                records.map { record ->
+                    record.copy(
+                        audioAmplitudes = AmplitudeNormalizer.normalize(
+                            sourceAmplitudes = record.audioAmplitudes,
+                            trackWidth = trackSizeInfo.trackWidth,
+                            barWidth = trackSizeInfo.barWidth,
+                            spacing = trackSizeInfo.spacing
+                        )
+                    )
+                }
+            } else records
+        }
+        .flowOn(Dispatchers.Default)
 
     fun onAction(action: RecordListAction) {
         when (action) {
@@ -57,6 +106,7 @@ class RecordListViewModel(
                     it.copy(currentCaptureMethod = AudioCaptureMethod.QUICK)
                 }
             }
+
             RecordListAction.OnRecordButtonLongClick -> {
                 startRecording(captureMethod = AudioCaptureMethod.QUICK)
             }
@@ -65,15 +115,74 @@ class RecordListViewModel(
             is RecordListAction.OnFilterByTopicToggle -> toggleTopicFilter(action.topic)
             is RecordListAction.OnRemoveFilters -> removeFilters(action.recordFilterDropdown)
 
-            is RecordListAction.OnPlayClick ->  onPlayRecordClick(action.recordId)
-            RecordListAction.OnPauseAudioClick ->  audioPlayer.pause()
-            is RecordListAction.OnTrackSizeAvailable -> TODO()
+            is RecordListAction.OnPlayClick -> onPlayRecordClick(action.recordId)
+            RecordListAction.OnPauseAudioClick -> audioPlayer.pause()
+            is RecordListAction.OnTrackSizeAvailable ->
+                audioTrackSizeInfo.update {
+                    action.trackSizeInfo
+                }
 
             RecordListAction.OnAudioPermissionGranted -> startRecording(captureMethod = AudioCaptureMethod.STANDARD)
             RecordListAction.OnCancelRecording -> cancelRecording()
             RecordListAction.OnCompleteRecording -> stopRecording()
             RecordListAction.OnPauseRecordingClick -> pauseRecording()
             RecordListAction.OnResumeRecordingClick -> resumeRecording()
+        }
+    }
+
+    private fun observeRecords() {
+        combine(
+            records,
+            playingEchoId,
+            audioPlayer.activeTrack
+        ) { records, playingEchoId, activeTrack ->
+            if (playingEchoId == null || activeTrack == null) {
+                return@combine records.map { it.toRecordUi() }
+            }
+
+            records.map { echo ->
+                if (echo.id == playingEchoId) {
+                    echo.toRecordUi(
+                        currentPlaybackDuration = activeTrack.durationPlayed,
+                        playbackState = if (activeTrack.isPlaying) PlaybackState.PLAYING else PlaybackState.PAUSED
+                    )
+                } else echo.toRecordUi()
+            }
+        }
+            .groupByRelativeDate()
+            .onEach { groupedRecords ->
+                _state.update {
+                    it.copy(
+                        records = groupedRecords
+                    )
+                }
+            }
+            .flowOn(Dispatchers.Default)
+            .launchIn(viewModelScope)
+    }
+
+    private fun Flow<List<RecordUi>>.groupByRelativeDate(): Flow<Map<UiText, List<RecordUi>>> {
+        val formatter = DateTimeFormatter.ofPattern("dd MMM")
+        val today = LocalDate.now()
+        return map { echos ->
+            echos
+                .groupBy { echo ->
+                    LocalDate.ofInstant(
+                        echo.recordedAt,
+                        ZoneId.systemDefault()
+                    )
+                }
+                .mapValues { (_, echos) ->
+                    echos.sortedByDescending { it.recordedAt }
+                }
+                .toSortedMap(compareByDescending { it })
+                .mapKeys { (date, _) ->
+                    when (date) {
+                        today -> UiText.StringResource(R.string.today)
+                        today.minusDays(1) -> UiText.StringResource(R.string.yesterday)
+                        else -> UiText.Dynamic(date.format(formatter))
+                    }
+                }
         }
     }
 
@@ -91,10 +200,10 @@ class RecordListViewModel(
         ) { selectedTopics, selectedMoods ->
             _state.update {
                 it.copy(
-                    topicFilterList = listOf("Topic A", "Topic B", "Topic C").map { topic ->
+                    topicFilterList = it.topicFilterList.map { selectableTopic ->
                         Selectable(
-                            item = topic,
-                            selected = selectedTopics.contains(topic)
+                            item = selectableTopic.item,
+                            selected = selectedTopics.contains(selectableTopic.item)
                         )
                     },
                     moodFilterList = MoodUi.entries.map { moodUi ->
@@ -262,18 +371,21 @@ class RecordListViewModel(
                     onComplete = ::completePlayback
                 )
             }
+
             else -> audioPlayer.resume()
         }
     }
 
     private fun completePlayback() {
-        _state.update { it.copy(
-            records = it.records.mapValues { (_, echos) ->
-                echos.map { echo ->
-                    echo.copy(playbackCurrentDuration = Duration.ZERO)
+        _state.update {
+            it.copy(
+                records = it.records.mapValues { (_, echos) ->
+                    echos.map { echo ->
+                        echo.copy(playbackCurrentDuration = Duration.ZERO)
+                    }
                 }
-            }
-        ) }
+            )
+        }
         playingEchoId.update { null }
     }
 }

@@ -16,7 +16,7 @@ data class RecordListUiState(
     val records: Map<UiText, List<RecordUi>> = emptyMap(),
     val currentCaptureMethod: AudioCaptureMethod? = null,
     val recordingElapsedDuration: Duration = Duration.ZERO,
-    val isLoadingData: Boolean = false,
+    val isLoadingData: Boolean = true,
     val recordingState: RecordingState = RecordingState.NOT_RECORDING,
     val moodFilterList: List<Selectable<MoodUi>> = emptyList(),
     val topicFilterList: List<Selectable<String>> = emptyList(),
