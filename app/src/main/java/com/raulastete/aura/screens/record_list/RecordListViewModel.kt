@@ -38,6 +38,7 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import kotlin.time.Duration
 import com.raulastete.aura.core.domain.record.Record
+import kotlinx.coroutines.withContext
 
 class RecordListViewModel(
     private val voiceRecorder: VoiceRecorder,
@@ -357,7 +358,23 @@ class RecordListViewModel(
             if (recordingDetails.duration < VoiceRecorder.MIN_RECORD_DURATION) {
                 eventChannel.send(RecordListEvent.RecordingTooShort)
             } else {
-                eventChannel.send(RecordListEvent.OnDoneRecording(recordingDetails))
+                //Arbitrary track dimensions to not make the app crash when navigating and passing
+                //the amplitudes as an argument
+                val normalizedAmplitudes = withContext(Dispatchers.Default) {
+                    AmplitudeNormalizer.normalize(
+                        sourceAmplitudes = recordingDetails.amplitudes,
+                        trackWidth = 10_000f,
+                        barWidth = 20f,
+                        spacing = 15f
+                    )
+                }
+                eventChannel.send(
+                    RecordListEvent.OnDoneRecording(
+                        recordingDetails.copy(
+                            amplitudes = normalizedAmplitudes
+                        )
+                    )
+                )
             }
         }
     }
