@@ -6,17 +6,19 @@ import kotlin.time.Duration.Companion.milliseconds
 
 sealed interface NavigationRoute {
     @Serializable
-    data object RecordList: NavigationRoute
+    data class RecordList(
+        val startRecording: Boolean
+    ) : NavigationRoute
 
     @Serializable
     data class CreateRecord(
         val recordingPath: String,
         val duration: Long,
         val amplitudes: String
-    ): NavigationRoute
+    ) : NavigationRoute
 
     @Serializable
-    data object Settings: NavigationRoute
+    data object Settings : NavigationRoute
 }
 
 fun RecordingDetails.toCreateRecordRoute(): NavigationRoute.CreateRecord {

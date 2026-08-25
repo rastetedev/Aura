@@ -1,5 +1,6 @@
 package com.raulastete.aura.screens.record_list
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.raulastete.aura.R
@@ -41,7 +42,8 @@ import com.raulastete.aura.core.domain.record.Record
 class RecordListViewModel(
     private val voiceRecorder: VoiceRecorder,
     private val audioPlayer: AudioPlayer,
-    private val recordDataSource: RecordDataSource
+    private val recordDataSource: RecordDataSource,
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private var hasLoadedInitialData = false
@@ -57,6 +59,7 @@ class RecordListViewModel(
             if (!hasLoadedInitialData) {
                 observeFilters()
                 observeRecords()
+                fetchNavigationArgs()
                 hasLoadedInitialData = true
             }
         }
@@ -129,6 +132,18 @@ class RecordListViewModel(
             RecordListAction.OnCompleteRecording -> stopRecording()
             RecordListAction.OnPauseRecordingClick -> pauseRecording()
             RecordListAction.OnResumeRecordingClick -> resumeRecording()
+        }
+    }
+
+    private fun fetchNavigationArgs() {
+        val startRecording = savedStateHandle.get<Boolean>("startRecording") ?: false
+        if (startRecording) {
+            _state.update {
+                it.copy(
+                    currentCaptureMethod = AudioCaptureMethod.STANDARD
+                )
+            }
+            requestAudioPermission()
         }
     }
 
@@ -223,7 +238,7 @@ class RecordListViewModel(
             recordDataSource.observeTopics(),
             selectedTopicFilters,
             selectedMoodFilters,
-        ) {allTopics, selectedTopics, selectedMoods ->
+        ) { allTopics, selectedTopics, selectedMoods ->
             _state.update {
                 it.copy(
                     topicFilterList = allTopics.map { topic ->
