@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -65,13 +66,16 @@ fun SelectMoodSheet(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(IntrinsicSize.Min),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-               SecondaryButton(
+                SecondaryButton(
                     text = stringResource(R.string.cancel),
-                    onClick = onDismiss
+                    onClick = onDismiss,
+                    modifier = Modifier
+                        .fillMaxHeight()
                 )
-               PrimaryButton(
+                PrimaryButton(
                     text = stringResource(R.string.confirm),
                     onClick = onConfirmClick,
                     modifier = Modifier.weight(1f),
@@ -79,6 +83,8 @@ fun SelectMoodSheet(
                         Icon(
                             imageVector = Icons.Filled.Check,
                             contentDescription = stringResource(R.string.confirm),
+                            modifier = Modifier
+                                .fillMaxHeight()
                         )
                     }
                 )
@@ -106,7 +112,7 @@ fun MoodItem(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Image(
-            imageVector = if(selected) {
+            imageVector = if (selected) {
                 ImageVector.vectorResource(mood.iconSet.fill)
             } else {
                 ImageVector.vectorResource(mood.iconSet.outline)
@@ -119,7 +125,7 @@ fun MoodItem(
         Text(
             text = mood.title.asString(),
             style = MaterialTheme.typography.labelMedium,
-            color = if(selected) {
+            color = if (selected) {
                 MaterialTheme.colorScheme.onSurface
             } else {
                 MaterialTheme.colorScheme.outline
