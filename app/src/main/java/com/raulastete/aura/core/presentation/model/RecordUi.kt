@@ -1,7 +1,7 @@
 package com.raulastete.aura.core.presentation.model
 
-import com.raulastete.aura.core.domain.record.Record
 import com.raulastete.aura.core.presentation.util.string.formatHHmm
+import com.raulastete.aura.features.record.Record
 import java.time.Instant
 import kotlin.time.Duration
 

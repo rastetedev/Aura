@@ -19,7 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import com.raulastete.aura.R
-import com.raulastete.aura.core.presentation.designsystem.theme.AuraTheme
+import com.raulastete.aura.core.designsystem.theme.AuraTheme
 
 @Composable
 fun EchoExpandableText(

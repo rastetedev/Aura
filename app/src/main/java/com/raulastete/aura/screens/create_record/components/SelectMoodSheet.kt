@@ -2,7 +2,6 @@ package com.raulastete.aura.screens.create_record.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -11,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -28,9 +26,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import com.raulastete.aura.R
-import com.raulastete.aura.core.presentation.designsystem.buttons.PrimaryButton
-import com.raulastete.aura.core.presentation.designsystem.buttons.SecondaryButton
-import com.raulastete.aura.core.presentation.designsystem.mood.MoodSelectorRow
+import com.raulastete.aura.core.designsystem.buttons.PrimaryButton
+import com.raulastete.aura.core.designsystem.buttons.SecondaryButton
+import com.raulastete.aura.core.designsystem.mood.MoodSelectorRow
 import com.raulastete.aura.core.presentation.model.MoodUi
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -42,7 +40,6 @@ fun SelectMoodSheet(
     onConfirmClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val allMoods = MoodUi.entries.toList()
 
     ModalBottomSheet(
         onDismissRequest = onDismiss
@@ -70,11 +67,11 @@ fun SelectMoodSheet(
                     .height(IntrinsicSize.Min),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                SecondaryButton(
+               SecondaryButton(
                     text = stringResource(R.string.cancel),
                     onClick = onDismiss
                 )
-                PrimaryButton(
+               PrimaryButton(
                     text = stringResource(R.string.confirm),
                     onClick = onConfirmClick,
                     modifier = Modifier.weight(1f),

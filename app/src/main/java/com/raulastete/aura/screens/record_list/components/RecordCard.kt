@@ -14,11 +14,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.raulastete.aura.core.presentation.designsystem.chips.HashtagChip
-import com.raulastete.aura.core.presentation.designsystem.player.Player
+import com.raulastete.aura.core.designsystem.chips.HashtagChip
 import com.raulastete.aura.core.presentation.model.RecordUi
 import com.raulastete.aura.core.presentation.model.TrackSizeInfo
-import com.raulastete.aura.core.presentation.util.modifier.defaultShadow
+import com.raulastete.aura.core.designsystem.modifier.defaultShadow
+import com.raulastete.aura.core.designsystem.player.Player
 
 @Composable
 fun RecordCard(

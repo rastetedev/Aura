@@ -15,7 +15,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.raulastete.aura.R
-import com.raulastete.aura.core.presentation.designsystem.mood.MoodSelectorRow
+import com.raulastete.aura.core.designsystem.mood.MoodSelectorRow
 import com.raulastete.aura.core.presentation.model.MoodUi
 
 @Composable

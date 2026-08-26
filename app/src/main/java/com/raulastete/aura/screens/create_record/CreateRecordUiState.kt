@@ -1,6 +1,6 @@
 package com.raulastete.aura.screens.create_record
 
-import com.raulastete.aura.core.presentation.designsystem.dropdowns.Selectable
+import com.raulastete.aura.core.designsystem.dropdowns.Selectable
 import com.raulastete.aura.core.presentation.model.MoodUi
 import com.raulastete.aura.core.presentation.model.PlaybackState
 import kotlin.time.Duration

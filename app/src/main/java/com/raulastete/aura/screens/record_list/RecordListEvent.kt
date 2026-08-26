@@ -1,6 +1,6 @@
 package com.raulastete.aura.screens.record_list
 
-import com.raulastete.aura.core.domain.recording.RecordingDetails
+import com.raulastete.aura.features.recording.RecordingDetails
 
 sealed interface RecordListEvent {
 

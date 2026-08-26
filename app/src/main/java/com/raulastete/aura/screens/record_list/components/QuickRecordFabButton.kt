@@ -34,16 +34,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import com.raulastete.aura.core.presentation.designsystem.buttons.rememberBubbleFloatingActionButtonColors
-import com.raulastete.aura.core.presentation.designsystem.theme.Microphone
-import com.raulastete.aura.core.presentation.designsystem.theme.buttonGradient
-import com.raulastete.aura.core.presentation.designsystem.theme.buttonGradientPressed
-import com.raulastete.aura.core.presentation.designsystem.theme.primary90
-import com.raulastete.aura.core.presentation.designsystem.theme.primary95
 import kotlin.math.roundToInt
 import com.raulastete.aura.R
-import com.raulastete.aura.core.presentation.designsystem.buttons.BubbleFabButton
-import com.raulastete.aura.core.presentation.designsystem.theme.AuraTheme
+import com.raulastete.aura.core.designsystem.buttons.BubbleFabButton
+import com.raulastete.aura.core.designsystem.buttons.rememberBubbleFloatingActionButtonColors
+import com.raulastete.aura.core.designsystem.theme.AuraTheme
+import com.raulastete.aura.core.designsystem.theme.Microphone
+import com.raulastete.aura.core.designsystem.theme.buttonGradient
+import com.raulastete.aura.core.designsystem.theme.buttonGradientPressed
+import com.raulastete.aura.core.designsystem.theme.primary90
+import com.raulastete.aura.core.designsystem.theme.primary95
 
 @Composable
 fun QuickRecordFabButton(

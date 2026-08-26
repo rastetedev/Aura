@@ -14,11 +14,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.raulastete.aura.R
-import com.raulastete.aura.core.presentation.designsystem.theme.AuraTheme
+import com.raulastete.aura.core.designsystem.theme.AuraTheme
 import com.raulastete.aura.core.presentation.model.RecordUi
 import com.raulastete.aura.core.presentation.model.TrackSizeInfo
 import com.raulastete.aura.core.presentation.util.string.UiText
 import com.raulastete.aura.screens.record_list.model.RecordDaySection
+import kotlin.collections.forEachIndexed
 import kotlin.random.Random
 
 @Composable

@@ -36,19 +36,19 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.raulastete.aura.R
-import com.raulastete.aura.core.presentation.designsystem.chips.HashtagChip
-import com.raulastete.aura.core.presentation.designsystem.dropdowns.ExtraDropdownOption
-import com.raulastete.aura.core.presentation.designsystem.dropdowns.SelectableDropdown
-import com.raulastete.aura.core.presentation.designsystem.dropdowns.asUnselectedItems
-import com.raulastete.aura.core.presentation.designsystem.textfields.TransparentTextField
-import com.raulastete.aura.core.presentation.designsystem.theme.Gray6
+import com.raulastete.aura.core.designsystem.chips.HashtagChip
+import com.raulastete.aura.core.designsystem.dropdowns.ExtraDropdownOption
+import com.raulastete.aura.core.designsystem.dropdowns.SelectableDropdown
+import com.raulastete.aura.core.designsystem.dropdowns.asUnselectedItems
+import com.raulastete.aura.core.designsystem.textfields.TransparentTextField
+import com.raulastete.aura.core.designsystem.theme.Gray6
 
 @Composable
 fun DefaultTopicSelectorCard(
@@ -178,7 +178,7 @@ fun DefaultTopicSelectorCard(
                             contentDescription = null
                         )
                     },
-                    maxDropdownHeight = (LocalConfiguration.current.screenHeightDp * 0.3).dp,
+                    maxDropdownHeight = ( LocalWindowInfo.current.containerSize.height * 0.3).dp,
                     dropdownOffset = IntOffset(
                         x = 0,
                         y = topicSuggestionsVerticalOffset

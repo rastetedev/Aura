@@ -4,10 +4,10 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.raulastete.aura.R
-import com.raulastete.aura.core.domain.audio.AudioPlayer
-import com.raulastete.aura.core.domain.record.RecordDataSource
-import com.raulastete.aura.core.domain.recording.VoiceRecorder
-import com.raulastete.aura.core.presentation.designsystem.dropdowns.Selectable
+import com.raulastete.aura.core.designsystem.dropdowns.Selectable
+import com.raulastete.aura.features.player.AudioPlayer
+import com.raulastete.aura.features.record.RecordDataSource
+import com.raulastete.aura.features.recording.VoiceRecorder
 import com.raulastete.aura.core.presentation.model.MoodUi
 import com.raulastete.aura.core.presentation.model.PlaybackState
 import com.raulastete.aura.core.presentation.model.RecordUi
@@ -15,8 +15,6 @@ import com.raulastete.aura.core.presentation.model.TrackSizeInfo
 import com.raulastete.aura.core.presentation.model.toRecordUi
 import com.raulastete.aura.core.presentation.util.amplitude.AmplitudeNormalizer
 import com.raulastete.aura.core.presentation.util.string.UiText
-import com.raulastete.aura.screens.record_list.model.AudioCaptureMethod
-import com.raulastete.aura.screens.record_list.model.RecordingState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -37,7 +35,9 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import kotlin.time.Duration
-import com.raulastete.aura.core.domain.record.Record
+import com.raulastete.aura.features.record.Record
+import com.raulastete.aura.screens.record_list.model.AudioCaptureMethod
+import com.raulastete.aura.screens.record_list.model.RecordingState
 import kotlinx.coroutines.withContext
 
 class RecordListViewModel(

@@ -29,15 +29,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.raulastete.aura.R
-import com.raulastete.aura.core.domain.recording.RecordingDetails
-import com.raulastete.aura.core.presentation.designsystem.theme.AuraTheme
-import com.raulastete.aura.core.presentation.designsystem.theme.bgGradient
+import com.raulastete.aura.features.recording.RecordingDetails
+import com.raulastete.aura.core.designsystem.theme.AuraTheme
+import com.raulastete.aura.core.designsystem.theme.bgGradient
 import com.raulastete.aura.core.presentation.util.lifecycle.ObserveAsEvents
 import com.raulastete.aura.core.presentation.util.lifecycle.isAppInForeground
 import com.raulastete.aura.screens.record_list.components.FiltersSection
@@ -56,6 +57,8 @@ fun RecordListScreen(
     onNavigateToSettings: () -> Unit
 ) {
     val context = LocalContext.current
+    val resources = LocalResources.current
+
     val state by viewModel.state.collectAsStateWithLifecycle()
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
@@ -75,7 +78,7 @@ fun RecordListScreen(
             is RecordListEvent.RecordingTooShort -> {
                 Toast.makeText(
                     context,
-                    context.getString(R.string.audio_recording_was_too_short),
+                    resources.getString(R.string.audio_recording_was_too_short),
                     Toast.LENGTH_LONG
                 ).show()
             }
@@ -226,11 +229,7 @@ private fun RecordListContent(
                             onPlayClick = { onAction(RecordListAction.OnPlayClick(it)) },
                             onPauseClick = { onAction(RecordListAction.OnPauseAudioClick) },
                             onTrackSizeAvailable = {
-                                onAction(
-                                    RecordListAction.OnTrackSizeAvailable(
-                                        it
-                                    )
-                                )
+                                onAction(RecordListAction.OnTrackSizeAvailable(it))
                             },
                         )
                     }

@@ -43,6 +43,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.ImeAction
@@ -51,13 +52,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.raulastete.aura.R
-import com.raulastete.aura.core.presentation.designsystem.buttons.PrimaryButton
-import com.raulastete.aura.core.presentation.designsystem.buttons.SecondaryButton
-import com.raulastete.aura.core.presentation.designsystem.player.Player
-import com.raulastete.aura.core.presentation.designsystem.textfields.TransparentTextField
-import com.raulastete.aura.core.presentation.designsystem.theme.AuraTheme
-import com.raulastete.aura.core.presentation.designsystem.theme.secondary70
-import com.raulastete.aura.core.presentation.designsystem.theme.secondary95
+import com.raulastete.aura.core.designsystem.buttons.PrimaryButton
+import com.raulastete.aura.core.designsystem.buttons.SecondaryButton
+import com.raulastete.aura.core.designsystem.player.Player
+import com.raulastete.aura.core.designsystem.textfields.TransparentTextField
+import com.raulastete.aura.core.designsystem.theme.AuraTheme
+import com.raulastete.aura.core.designsystem.theme.secondary70
+import com.raulastete.aura.core.designsystem.theme.secondary95
 import com.raulastete.aura.core.presentation.util.lifecycle.ObserveAsEvents
 import com.raulastete.aura.screens.create_record.components.SelectMoodSheet
 import com.raulastete.aura.screens.create_record.components.TopicsRow
@@ -70,13 +71,14 @@ fun CreateRecordScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val resources = LocalResources.current
 
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
             CreateRecordEvent.FailedToSaveFile -> {
                 Toast.makeText(
                     context,
-                    context.getString(R.string.error_couldnt_save_file),
+                    resources.getString(R.string.error_couldnt_save_file),
                     Toast.LENGTH_LONG
                 ).show()
                 onConfirmLeave()
@@ -262,7 +264,7 @@ private fun CreateRecordContent(
                     modifier = Modifier
                         .fillMaxHeight()
                 )
-                PrimaryButton(
+               PrimaryButton(
                     text = stringResource(R.string.save),
                     onClick = {
                         onAction(CreateRecordAction.OnSaveClick)

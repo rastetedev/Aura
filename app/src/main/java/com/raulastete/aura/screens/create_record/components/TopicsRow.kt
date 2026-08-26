@@ -33,13 +33,13 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.raulastete.aura.R
-import com.raulastete.aura.core.presentation.designsystem.chips.HashtagChip
-import com.raulastete.aura.core.presentation.designsystem.dropdowns.ExtraDropdownOption
-import com.raulastete.aura.core.presentation.designsystem.dropdowns.Selectable
-import com.raulastete.aura.core.presentation.designsystem.dropdowns.SelectableDropdown
-import com.raulastete.aura.core.presentation.designsystem.dropdowns.asUnselectedItems
-import com.raulastete.aura.core.presentation.designsystem.textfields.TransparentTextField
-import com.raulastete.aura.core.presentation.designsystem.theme.AuraTheme
+import com.raulastete.aura.core.designsystem.chips.HashtagChip
+import com.raulastete.aura.core.designsystem.dropdowns.ExtraDropdownOption
+import com.raulastete.aura.core.designsystem.dropdowns.Selectable
+import com.raulastete.aura.core.designsystem.dropdowns.SelectableDropdown
+import com.raulastete.aura.core.designsystem.dropdowns.asUnselectedItems
+import com.raulastete.aura.core.designsystem.textfields.TransparentTextField
+import com.raulastete.aura.core.designsystem.theme.AuraTheme
 
 @Composable
 fun TopicsRow(
@@ -114,7 +114,7 @@ fun TopicsRow(
                     )
                     .fillMaxHeight(),
                 maxLines = 1,
-                hintText = if(topics.isEmpty()) {
+                hintText = if (topics.isEmpty()) {
                     stringResource(R.string.topic)
                 } else null
             )
@@ -123,7 +123,7 @@ fun TopicsRow(
         if(showTopicSuggestions) {
             SelectableDropdown(
                 items = searchResults,
-                 textForItem = { it },
+                textForItem = { it },
                 onDismiss = onDismissTopicSuggestions,
                 itemKey = { it },
                 onItemClick = { onTopicClick(it.item) },
@@ -140,7 +140,7 @@ fun TopicsRow(
                     x = 0,
                     y = topicRowHeight
                 ),
-                extraDropdownOption = if(showCreateTopicOption) {
+                extraDropdownOption = if (showCreateTopicOption) {
                     ExtraDropdownOption(
                         text = addTopicText,
                         onClick = { onTopicClick(addTopicText) }

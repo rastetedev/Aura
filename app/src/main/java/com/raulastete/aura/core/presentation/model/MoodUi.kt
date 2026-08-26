@@ -3,21 +3,21 @@ package com.raulastete.aura.core.presentation.model
 import androidx.annotation.DrawableRes
 import androidx.compose.ui.graphics.Color
 import com.raulastete.aura.R
-import com.raulastete.aura.core.presentation.designsystem.theme.Excited25
-import com.raulastete.aura.core.presentation.designsystem.theme.Excited35
-import com.raulastete.aura.core.presentation.designsystem.theme.Excited80
-import com.raulastete.aura.core.presentation.designsystem.theme.Neutral25
-import com.raulastete.aura.core.presentation.designsystem.theme.Neutral35
-import com.raulastete.aura.core.presentation.designsystem.theme.Neutral80
-import com.raulastete.aura.core.presentation.designsystem.theme.Peaceful25
-import com.raulastete.aura.core.presentation.designsystem.theme.Peaceful35
-import com.raulastete.aura.core.presentation.designsystem.theme.Peaceful80
-import com.raulastete.aura.core.presentation.designsystem.theme.Sad25
-import com.raulastete.aura.core.presentation.designsystem.theme.Sad35
-import com.raulastete.aura.core.presentation.designsystem.theme.Sad80
-import com.raulastete.aura.core.presentation.designsystem.theme.Stressed25
-import com.raulastete.aura.core.presentation.designsystem.theme.Stressed35
-import com.raulastete.aura.core.presentation.designsystem.theme.Stressed80
+import com.raulastete.aura.core.designsystem.theme.Excited25
+import com.raulastete.aura.core.designsystem.theme.Excited35
+import com.raulastete.aura.core.designsystem.theme.Excited80
+import com.raulastete.aura.core.designsystem.theme.Neutral25
+import com.raulastete.aura.core.designsystem.theme.Neutral35
+import com.raulastete.aura.core.designsystem.theme.Neutral80
+import com.raulastete.aura.core.designsystem.theme.Peaceful25
+import com.raulastete.aura.core.designsystem.theme.Peaceful35
+import com.raulastete.aura.core.designsystem.theme.Peaceful80
+import com.raulastete.aura.core.designsystem.theme.Sad25
+import com.raulastete.aura.core.designsystem.theme.Sad35
+import com.raulastete.aura.core.designsystem.theme.Sad80
+import com.raulastete.aura.core.designsystem.theme.Stressed25
+import com.raulastete.aura.core.designsystem.theme.Stressed35
+import com.raulastete.aura.core.designsystem.theme.Stressed80
 import com.raulastete.aura.core.presentation.util.string.UiText
 
 enum class MoodUi(

@@ -26,9 +26,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.raulastete.aura.R
-import com.raulastete.aura.core.presentation.designsystem.theme.AuraTheme
-import com.raulastete.aura.core.presentation.designsystem.theme.bgGradient
-import com.raulastete.aura.core.presentation.util.modifier.defaultShadow
+import com.raulastete.aura.core.designsystem.modifier.defaultShadow
+import com.raulastete.aura.core.designsystem.theme.AuraTheme
+import com.raulastete.aura.core.designsystem.theme.bgGradient
 import com.raulastete.aura.screens.settings.components.DefaultTopicSelectorCard
 import com.raulastete.aura.screens.settings.components.MoodCard
 import org.koin.androidx.compose.koinViewModel
