@@ -2,8 +2,6 @@ package com.raulastete.aura.screens.create_record
 
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -14,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -39,8 +38,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalResources
@@ -152,9 +151,7 @@ private fun CreateRecordContent(
             ) {
                 if (state.form.mood == null) {
                     FilledIconButton(
-                        onClick = {
-                            onAction(CreateRecordAction.OnSelectMoodClick)
-                        },
+                        onClick = { onAction(CreateRecordAction.OnSelectMoodClick) },
                         colors = IconButtonDefaults.filledIconButtonColors(
                             containerColor = MaterialTheme.colorScheme.secondary95,
                             contentColor = MaterialTheme.colorScheme.secondary70
@@ -162,20 +159,22 @@ private fun CreateRecordContent(
                     ) {
                         Icon(
                             imageVector = Icons.Filled.Add,
-                            contentDescription = stringResource(R.string.add_mood)
+                            contentDescription = stringResource(R.string.add_mood),
+                            modifier = Modifier.size(32.dp)
                         )
                     }
                 } else {
-                    Image(
-                        imageVector = ImageVector.vectorResource(state.form.mood.iconSet.fill),
-                        contentDescription = state.form.mood.title.asString(),
-                        modifier = Modifier
-                            .height(32.dp)
-                            .clickable {
-                                onAction(CreateRecordAction.OnSelectMoodClick)
-                            },
-                        contentScale = ContentScale.FillHeight
-                    )
+                    IconButton(
+                        onClick = { onAction(CreateRecordAction.OnSelectMoodClick) },
+                        shape = CircleShape
+                    ) {
+                        Icon(
+                            imageVector = ImageVector.vectorResource(state.form.mood.iconSet.fill),
+                            contentDescription = state.form.mood.title.asString(),
+                            tint = Color.Unspecified,
+                            modifier = Modifier.size(32.dp)
+                        )
+                    }
                 }
 
                 TransparentTextField(
@@ -264,7 +263,7 @@ private fun CreateRecordContent(
                     modifier = Modifier
                         .fillMaxHeight()
                 )
-               PrimaryButton(
+                PrimaryButton(
                     text = stringResource(R.string.save),
                     onClick = {
                         onAction(CreateRecordAction.OnSaveClick)
