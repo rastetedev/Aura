@@ -103,7 +103,6 @@ private fun SheetContent(
                     fontFeatureSettings = "tnum",
                     textAlign = TextAlign.Center
                 ),
-                modifier = Modifier.defaultMinSize(minWidth = 100.dp),
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
