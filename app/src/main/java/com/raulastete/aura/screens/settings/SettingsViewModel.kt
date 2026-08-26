@@ -55,7 +55,23 @@ class SettingsViewModel(
             is SettingsAction.OnMoodClick -> onMoodClick(action.mood)
             is SettingsAction.OnRemoveTopicClick -> onRemoveTopicClick(action.topic)
             is SettingsAction.OnSearchTextChange -> onSearchTextChange(action.text)
+            SettingsAction.OnRemoveFocusOnInputText -> onHideTextInput()
         }
+    }
+
+    private fun onHideTextInput() {
+        if (state.value.searchText.isNotBlank()) {
+            onSelectTopic(state.value.searchText)
+        } else {
+            _state.update {
+                it.copy(
+                    isTopicTextInputVisible = false,
+                    searchText = "",
+                    isTopicSuggestionsVisible = false,
+                )
+            }
+        }
+
     }
 
     private fun observeSettings() {

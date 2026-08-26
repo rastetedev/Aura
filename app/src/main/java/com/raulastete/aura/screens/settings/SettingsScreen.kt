@@ -1,6 +1,7 @@
 package com.raulastete.aura.screens.settings
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,6 +21,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -43,7 +46,7 @@ fun SettingsScreen(
     SettingsContent(
         state = state,
         onAction = { action ->
-            when(action) {
+            when (action) {
                 is SettingsAction.OnBackClick -> onGoBack()
                 else -> Unit
             }
@@ -58,6 +61,8 @@ fun SettingsContent(
     state: SettingsUiState,
     onAction: (SettingsAction) -> Unit,
 ) {
+    val focusManager = LocalFocusManager.current
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -92,6 +97,14 @@ fun SettingsContent(
                 .background(
                     brush = MaterialTheme.colorScheme.bgGradient
                 )
+                .pointerInput(Unit) {
+                    detectTapGestures(
+                        onTap = {
+                            focusManager.clearFocus()
+                            onAction(SettingsAction.OnRemoveFocusOnInputText)
+                        }
+                    )
+                }
                 .padding(innerPadding)
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)

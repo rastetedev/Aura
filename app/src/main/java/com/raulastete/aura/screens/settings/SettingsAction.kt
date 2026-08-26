@@ -9,5 +9,6 @@ sealed interface SettingsAction {
     data object OnBackClick: SettingsAction
     data object OnDismissTopicDropDown: SettingsAction
     data object OnAddButtonClick: SettingsAction
+    object OnRemoveFocusOnInputText : SettingsAction
     data class OnMoodClick(val mood: MoodUi): SettingsAction
 }
