@@ -47,6 +47,7 @@ fun PrimaryButton(
         enabled = enabled,
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.Transparent,
+            disabledContainerColor = Color.Transparent,
             contentColor = MaterialTheme.colorScheme.onPrimary,
         ),
         shape = CircleShape
