@@ -126,7 +126,7 @@ fun MoodItem(
             text = mood.title.asString(),
             style = MaterialTheme.typography.labelMedium,
             color = if (selected) {
-                MaterialTheme.colorScheme.onSurface
+                mood.colorSet.vivid
             } else {
                 MaterialTheme.colorScheme.outline
             }
