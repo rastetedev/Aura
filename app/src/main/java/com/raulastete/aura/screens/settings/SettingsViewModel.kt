@@ -8,18 +8,18 @@ import com.raulastete.aura.features.settings.SettingsPreferences
 import com.raulastete.aura.core.presentation.model.MoodUi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.distinctUntilChangedBy
-import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.milliseconds
@@ -73,13 +73,15 @@ class SettingsViewModel(
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     private fun observeTopicSearchResults() {
         state
-            .distinctUntilChangedBy { it.searchText }
             .map { it.searchText }
-            .debounce(300.milliseconds)
-            .flatMapLatest { query ->
-                if(query.isNotBlank()) {
-                    recordDataSource.searchTopics(query)
-                } else emptyFlow()
+            .distinctUntilChanged()
+            .transformLatest { query ->
+                if (query.isBlank()) {
+                    emit(emptyList())
+                } else {
+                    delay(300.milliseconds)
+                    emitAll(recordDataSource.searchTopics(query))
+                }
             }
             .onEach { filteredResults ->
                 _state.update {
@@ -96,7 +98,6 @@ class SettingsViewModel(
             }
             .launchIn(viewModelScope)
     }
-
 
     private fun onMoodClick(mood: MoodUi) {
         viewModelScope.launch {

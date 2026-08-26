@@ -18,13 +18,15 @@ import com.raulastete.aura.app.navigation.NavigationRoute
 import com.raulastete.aura.app.navigation.toRecordingDetails
 import com.raulastete.aura.core.designsystem.dropdowns.asUnselectedItems
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -33,6 +35,7 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.Instant
@@ -221,23 +224,34 @@ class CreateRecordViewModel(
         }
     }
 
-    @OptIn(FlowPreview::class)
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     private fun observeAddTopicText() {
         state
             .map { it.topicPopupUiState.addTopicText }
             .distinctUntilChanged()
-            .debounce(300.milliseconds)
-            .onEach { query ->
+            .transformLatest { query ->
+                if (query.isBlank()) {
+                    emit(emptyList())
+                } else {
+                    delay(300.milliseconds)
+                    emitAll(recordDataSource.searchTopics(query))
+                }
+            }
+            .onEach { filteredResults ->
                 _state.update {
+                    val filteredNonDefaultResults = filteredResults - it.form.topics.toSet()
+                    val searchText = it.topicPopupUiState.addTopicText.trim()
+                    val isNewTopic = searchText !in filteredNonDefaultResults && searchText !in it.form.topics
+                            && searchText.isNotBlank()
+
                     it.copy(
                         topicPopupUiState = it.topicPopupUiState.copy(
-                            showTopicSuggestions = query.isNotBlank() && query.trim() !in it.form.topics,
-                            searchResults = listOf(
-                                "hello",
-                                "helloworld",
-                            ).asUnselectedItems()
-                        ),
+                            showTopicSuggestions = searchText.isNotBlank() && searchText.trim() !in it.form.topics,
+                            searchResults = filteredNonDefaultResults.asUnselectedItems(),
+                            showCreateTopicOption = isNewTopic
+                        )
                     )
+
                 }
             }
             .launchIn(viewModelScope)
