@@ -5,6 +5,7 @@ import com.raulastete.aura.features.record.Record
 import com.raulastete.aura.features.record.RecordDataSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import java.time.Instant
 import kotlin.collections.map
 
 class RoomRecordDataSource(
@@ -17,6 +18,14 @@ class RoomRecordDataSource(
                 recordWithTopics.map { recordWithTopic ->
                     recordWithTopic.toRecord()
                 }
+            }
+    }
+
+    override fun getRecordsInRange(start: Instant, end: Instant): Flow<List<Record>> {
+        return recordDao
+            .getRecordsInRange(start.toEpochMilli(), end.toEpochMilli())
+            .map { recordWithTopics ->
+                recordWithTopics.map { it.toRecord() }
             }
     }
 

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.PieChart
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -54,6 +55,7 @@ import org.koin.androidx.compose.koinViewModel
 fun RecordListScreen(
     viewModel: RecordListViewModel = koinViewModel(),
     onNavigateToCreateRecord: (RecordingDetails) -> Unit,
+    onNavigateToStatistics: () -> Unit,
     onNavigateToSettings: () -> Unit
 ) {
     val context = LocalContext.current
@@ -91,13 +93,14 @@ fun RecordListScreen(
 
     val isAppInForeground by isAppInForeground()
     LaunchedEffect(isAppInForeground, state.recordingState) {
-        if(state.recordingState == RecordingState.NORMAL_CAPTURE && isAppInForeground.not()){
+        if (state.recordingState == RecordingState.NORMAL_CAPTURE && isAppInForeground.not()) {
             viewModel.onAction(RecordListAction.OnPauseRecordingClick)
         }
     }
 
     RecordListContent(
         state = state,
+        onStatisticsClick = onNavigateToStatistics,
         onSettingsClick = onNavigateToSettings,
         onAction = viewModel::onAction
     )
@@ -107,6 +110,7 @@ fun RecordListScreen(
 @Composable
 private fun RecordListContent(
     state: RecordListUiState,
+    onStatisticsClick: () -> Unit,
     onSettingsClick: () -> Unit,
     onAction: (RecordListAction) -> Unit,
 ) {
@@ -123,6 +127,13 @@ private fun RecordListContent(
                     )
                 },
                 actions = {
+                    IconButton(onClick = onStatisticsClick) {
+                        Icon(
+                            imageVector = Icons.Outlined.PieChart,
+                            contentDescription = stringResource(R.string.statistics),
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
                     IconButton(onClick = onSettingsClick) {
                         Icon(
                             imageVector = Icons.Outlined.Settings,
@@ -146,9 +157,9 @@ private fun RecordListContent(
                         Manifest.permission.RECORD_AUDIO
                     ) == PackageManager.PERMISSION_GRANTED
 
-                    if(hasPermission.not()) return@QuickRecordFabButton
+                    if (hasPermission.not()) return@QuickRecordFabButton
 
-                    if(cancelledRecording) {
+                    if (cancelledRecording) {
                         onAction(RecordListAction.OnCancelRecording)
                     } else {
                         onAction(RecordListAction.OnCompleteRecording)
@@ -159,7 +170,7 @@ private fun RecordListContent(
                         context,
                         Manifest.permission.RECORD_AUDIO
                     ) == PackageManager.PERMISSION_GRANTED
-                    if(hasPermission) {
+                    if (hasPermission) {
                         onAction(RecordListAction.OnRecordButtonLongClick)
                     } else {
                         onAction(RecordListAction.OnRequestPermissionQuickRecording)
@@ -261,6 +272,7 @@ private fun Preview() {
     AuraTheme {
         RecordListContent(
             state = RecordListUiState(isLoadingData = false),
+            onStatisticsClick = {},
             onSettingsClick = {},
             onAction = {}
         )

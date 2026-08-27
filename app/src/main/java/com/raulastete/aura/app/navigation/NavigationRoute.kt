@@ -19,6 +19,9 @@ sealed interface NavigationRoute {
 
     @Serializable
     data object Settings : NavigationRoute
+
+    @Serializable
+    data object Statistics : NavigationRoute
 }
 
 fun RecordingDetails.toCreateRecordRoute(): NavigationRoute.CreateRecord {

@@ -60,4 +60,9 @@
     <string name="this_cannot_be_undone">This can\'t be undone.</string>
     <string name="error_couldnt_save_file">Oops, saving the file failed.</string>
     <string name="record_new_emotion">Record new emotion</string>
+    <string name="statistics">Statistics</string>
+    <string name="mood_map">Mood Map</string>
+    <string name="mood_distribution">Mood Distribution</string>
+    <string name="mood_map_description">Each square represents a day—discover the rhythm of your emotions.</string>
+    <string name="mood_distribution_description">Understand your emotional patterns and overall mood trends.</string>
 </resources>

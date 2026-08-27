@@ -8,6 +8,7 @@ import androidx.navigation.navDeepLink
 import com.raulastete.aura.screens.create_record.CreateRecordScreen
 import com.raulastete.aura.screens.record_list.RecordListScreen
 import com.raulastete.aura.screens.settings.SettingsScreen
+import com.raulastete.aura.screens.statistics.StatisticsScreen
 
 const val ACTION_CREATE_RECORD = "com.raulastete.aura.CREATE_RECORD"
 
@@ -32,6 +33,9 @@ fun NavigationRoot(
                 onNavigateToCreateRecord = { details ->
                     navController.navigate(details.toCreateRecordRoute())
                 },
+                onNavigateToStatistics = {
+                    navController.navigate(NavigationRoute.Statistics)
+                },
                 onNavigateToSettings = {
                     navController.navigate(NavigationRoute.Settings)
                 }
@@ -44,6 +48,12 @@ fun NavigationRoot(
         }
         composable<NavigationRoute.Settings> {
             SettingsScreen(
+                onGoBack = navController::navigateUp
+            )
+        }
+
+        composable<NavigationRoute.Statistics> {
+            StatisticsScreen(
                 onGoBack = navController::navigateUp
             )
         }

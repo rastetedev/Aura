@@ -7,9 +7,13 @@ import com.raulastete.aura.features.player.data.AndroidAudioPlayer
 import com.raulastete.aura.features.record.data.RoomRecordDataSource
 import com.raulastete.aura.features.recording.data.InternalRecordingStorage
 import com.raulastete.aura.features.settings.data.DataStoreSettings
+import com.raulastete.aura.features.statistics.CalculateMoodFrequencyByRecords
+import com.raulastete.aura.features.statistics.CalculateMoodHeatMapByRecords
+import com.raulastete.aura.features.statistics.GetMoodStatisticsUseCase
 import com.raulastete.aura.screens.create_record.CreateRecordViewModel
 import com.raulastete.aura.screens.record_list.RecordListViewModel
 import com.raulastete.aura.screens.settings.SettingsViewModel
+import com.raulastete.aura.screens.statistics.StatisticsViewModel
 import kotlinx.coroutines.CoroutineScope
 import org.koin.android.ext.koin.androidApplication
 import org.koin.core.module.dsl.singleOf
@@ -48,7 +52,12 @@ val appModule = module {
     singleOf(::RoomRecordDataSource) bind com.raulastete.aura.features.record.RecordDataSource::class
     singleOf(::DataStoreSettings) bind com.raulastete.aura.features.settings.SettingsPreferences::class
 
+    singleOf(::GetMoodStatisticsUseCase)
+    singleOf(::CalculateMoodHeatMapByRecords)
+    singleOf(::CalculateMoodFrequencyByRecords)
+
     viewModelOf(::RecordListViewModel)
     viewModelOf(::CreateRecordViewModel)
     viewModelOf(::SettingsViewModel)
+    viewModelOf(::StatisticsViewModel)
 }

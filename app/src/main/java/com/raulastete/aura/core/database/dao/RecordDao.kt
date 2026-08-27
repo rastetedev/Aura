@@ -31,6 +31,9 @@ interface RecordDao {
     @Insert
     suspend fun insertRecord(recordEntity: RecordEntity): Long
 
+    @Query("SELECT * FROM RecordEntity WHERE recordedAt BETWEEN :start AND :end ORDER BY recordedAt DESC")
+    fun getRecordsInRange(start: Long, end: Long): Flow<List<RecordWithTopics>>
+
     @Upsert
     suspend fun upsertTopic(topicEntity: TopicEntity)
 
