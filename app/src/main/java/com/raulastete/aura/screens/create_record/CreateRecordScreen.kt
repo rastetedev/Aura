@@ -2,6 +2,7 @@ package com.raulastete.aura.screens.create_record
 
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -31,6 +32,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -56,6 +58,7 @@ import com.raulastete.aura.core.designsystem.buttons.SecondaryButton
 import com.raulastete.aura.core.designsystem.player.Player
 import com.raulastete.aura.core.designsystem.textfields.TransparentTextField
 import com.raulastete.aura.core.designsystem.theme.AuraTheme
+import com.raulastete.aura.core.designsystem.theme.bgGradient
 import com.raulastete.aura.core.designsystem.theme.secondary70
 import com.raulastete.aura.core.designsystem.theme.secondary95
 import com.raulastete.aura.core.presentation.util.lifecycle.ObserveAsEvents
@@ -128,8 +131,12 @@ private fun CreateRecordContent(
                             contentDescription = stringResource(R.string.navigate_back)
                         )
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.Transparent
+                )
             )
+
         }
     ) { innerPadding ->
         val descriptionFocusRequester = remember { FocusRequester() }
@@ -137,10 +144,11 @@ private fun CreateRecordContent(
 
         Column(
             modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.bgGradient)
                 .padding(innerPadding)
                 .padding(horizontal = 16.dp)
-                .padding(bottom = 16.dp)
-                .fillMaxSize(),
+                .padding(bottom = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Row(

@@ -1,6 +1,5 @@
 package com.raulastete.aura.screens.settings.components
 
-
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,6 +18,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
@@ -76,120 +77,130 @@ fun DefaultTopicSelectorCard(
     }
 
     LaunchedEffect(canInputText) {
-        if(canInputText) {
+        if (canInputText) {
             topicTextFocusRequester.requestFocus()
         }
     }
 
-    Column(
-        modifier = modifier
-            .clip(RoundedCornerShape(8.dp))
-            .background(MaterialTheme.colorScheme.surface)
-            .padding(14.dp)
-            .animateContentSize()
+    Card(
+        modifier = modifier,
+        shape = RoundedCornerShape(8.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        )
     ) {
-        Text(
-            text = stringResource(R.string.my_topics),
-            style = MaterialTheme.typography.headlineSmall,
-            color = MaterialTheme.colorScheme.onSurface
-        )
-        Text(
-            text = stringResource(R.string.select_default_topics_to_apply_to_all_new_entries),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Box(
-            modifier = Modifier.onSizeChanged {
-                topicSuggestionsVerticalOffset = it.height
-            }
+        Column(
+            modifier = Modifier
+                .padding(14.dp)
+                .animateContentSize()
         ) {
-            FlowRow(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-                verticalArrangement = Arrangement.spacedBy(6.dp)
-            ) {
-                topics.forEach { topic ->
-                    HashtagChip(
-                        text = topic,
-                        trailingIcon = {
-                            Icon(
-                                imageVector = Icons.Default.Close,
-                                contentDescription = stringResource(R.string.remove_topic, topic),
-                                tint = MaterialTheme.colorScheme.onSurface,
-                                modifier = Modifier
-                                    .size(14.dp)
-                                    .clickable {
-                                        onRemoveTopicClick(topic)
-                                    }
-                            )
-                        }
-                    )
+            Text(
+                text = stringResource(R.string.my_topics),
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Spacer(Modifier.height(6.dp))
+            Text(
+                text = stringResource(R.string.select_default_topics_to_apply_to_all_new_entries),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Box(
+                modifier = Modifier.onSizeChanged {
+                    topicSuggestionsVerticalOffset = it.height
                 }
-                if (canInputText) {
-                    TransparentTextField(
-                        text = searchText,
-                        onValueChange = onSearchTextChange,
-                        modifier = Modifier
-                            .weight(1f)
-                            .align(Alignment.CenterVertically)
-                            .focusRequester(topicTextFocusRequester),
-                        hintText = null,
-                        textStyle = LocalTextStyle.current.copy(
-                            color = MaterialTheme.colorScheme.onSurface
-                        ),
-                        maxLines = 1,
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions(
-                            imeAction = ImeAction.None
-                        ),
-                    )
-                } else {
-                    Box(
-                        modifier = Modifier
-                            .clip(CircleShape)
-                            .background(Gray6)
-                            .clickable(onClick = onToggleCanInputText),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = stringResource(R.string.add_new_entry),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier
-                                .padding(2.dp)
+            ) {
+                FlowRow(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    verticalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    topics.forEach { topic ->
+                        HashtagChip(
+                            text = topic,
+                            trailingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = stringResource(
+                                        R.string.remove_topic,
+                                        topic
+                                    ),
+                                    tint = MaterialTheme.colorScheme.onSurface,
+                                    modifier = Modifier
+                                        .size(14.dp)
+                                        .clickable {
+                                            onRemoveTopicClick(topic)
+                                        }
+                                )
+                            }
                         )
                     }
-                }
-            }
-
-            if (showSuggestionsDropDown) {
-                SelectableDropdown(
-                    items = unselectedSuggestions,
-                    textForItem = { it },
-                    onDismiss = onDismissSuggestionsDropDown,
-                    itemKey = { it },
-                    onItemClick = { onAddTopicClick(it.item) },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = ImageVector.vectorResource(R.drawable.hashtag),
-                            contentDescription = null
-                        )
-                    },
-                    maxDropdownHeight = ( LocalWindowInfo.current.containerSize.height * 0.3).dp,
-                    dropdownOffset = IntOffset(
-                        x = 0,
-                        y = topicSuggestionsVerticalOffset
-                    ),
-                    extraDropdownOption = if(showCreateTopicOption) {
-                        ExtraDropdownOption(
+                    if (canInputText) {
+                        TransparentTextField(
                             text = searchText,
-                            onClick = { onAddTopicClick(searchText) }
+                            onValueChange = onSearchTextChange,
+                            modifier = Modifier
+                                .weight(1f)
+                                .align(Alignment.CenterVertically)
+                                .focusRequester(topicTextFocusRequester),
+                            hintText = null,
+                            textStyle = LocalTextStyle.current.copy(
+                                color = MaterialTheme.colorScheme.onSurface
+                            ),
+                            maxLines = 1,
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(
+                                imeAction = ImeAction.None
+                            ),
                         )
-                    } else null
-                )
+                    } else {
+                        Box(
+                            modifier = Modifier
+                                .clip(CircleShape)
+                                .background(Gray6)
+                                .clickable(onClick = onToggleCanInputText),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = stringResource(R.string.add_new_entry),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier
+                                    .padding(2.dp)
+                            )
+                        }
+                    }
+                }
+
+                if (showSuggestionsDropDown) {
+                    SelectableDropdown(
+                        items = unselectedSuggestions,
+                        textForItem = { it },
+                        onDismiss = onDismissSuggestionsDropDown,
+                        itemKey = { it },
+                        onItemClick = { onAddTopicClick(it.item) },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = ImageVector.vectorResource(R.drawable.hashtag),
+                                contentDescription = null
+                            )
+                        },
+                        maxDropdownHeight = (LocalWindowInfo.current.containerSize.height * 0.3).dp,
+                        dropdownOffset = IntOffset(
+                            x = 0,
+                            y = topicSuggestionsVerticalOffset
+                        ),
+                        extraDropdownOption = if (showCreateTopicOption) {
+                            ExtraDropdownOption(
+                                text = searchText,
+                                onClick = { onAddTopicClick(searchText) }
+                            )
+                        } else null
+                    )
+                }
             }
         }
     }
