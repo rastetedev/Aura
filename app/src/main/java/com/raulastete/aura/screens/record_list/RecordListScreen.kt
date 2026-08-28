@@ -7,8 +7,10 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
@@ -37,7 +39,6 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.raulastete.aura.R
-import com.raulastete.aura.core.features.recording.RecordingDetails
 import com.raulastete.aura.core.designsystem.theme.AuraTheme
 import com.raulastete.aura.core.designsystem.theme.bgGradient
 import com.raulastete.aura.core.presentation.util.lifecycle.ObserveAsEvents
@@ -200,7 +201,7 @@ private fun RecordListContent(
                 state.hasRecords.not() -> {
                     Column(Modifier.fillMaxWidth()) {
                         FiltersSection(
-                            modifier = Modifier.padding(16.dp),
+                            modifier = Modifier.padding(horizontal = 16.dp),
                             moods = state.moodFilterList,
                             topics = state.topicFilterList,
                             moodChipContent = state.moodChipContent,
@@ -220,10 +221,9 @@ private fun RecordListContent(
                 }
 
                 else -> {
-
                     Column(Modifier.fillMaxWidth()) {
                         FiltersSection(
-                            modifier = Modifier.padding(16.dp),
+                            modifier = Modifier.padding(horizontal = 16.dp),
                             moods = state.moodFilterList,
                             topics = state.topicFilterList,
                             moodChipContent = state.moodChipContent,
@@ -232,6 +232,8 @@ private fun RecordListContent(
                             isTopicFilterActive = state.isTopicFilterActive,
                             onAction = onAction,
                         )
+
+                        Spacer(Modifier.height(8.dp))
 
                         RecordList(
                             modifier = Modifier
