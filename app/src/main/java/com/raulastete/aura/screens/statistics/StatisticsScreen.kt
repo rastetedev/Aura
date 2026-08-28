@@ -36,8 +36,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.raulastete.aura.R
 import com.raulastete.aura.core.designsystem.theme.bgGradient
-import com.raulastete.aura.screens.statistics.components.MoodDistributionChartCanvas
-import com.raulastete.aura.screens.statistics.components.MoodHeatmapCanvas
+import com.raulastete.aura.screens.statistics.components.MoodDistributionChart
+import com.raulastete.aura.screens.statistics.components.MoodHeatmapChart
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -54,6 +54,7 @@ fun StatisticsScreen(
                 title = {
                     Text(
                         text = stringResource(R.string.statistics),
+                        style = MaterialTheme.typography.headlineMedium,
                         textAlign = TextAlign.Center
                     )
                 },
@@ -112,7 +113,12 @@ fun StatisticsScreen(
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Spacer(modifier = Modifier.height(16.dp))
-                        MoodHeatmapCanvas(heatmapDays = state.heatmapDays)
+                        MoodHeatmapChart(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp),
+                            heatmapDays = state.heatmapDays
+                        )
                     }
                 }
 
@@ -136,7 +142,7 @@ fun StatisticsScreen(
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Spacer(modifier = Modifier.height(16.dp))
-                        MoodDistributionChartCanvas(frequencies = state.moodFrequencies)
+                        MoodDistributionChart(moodFrequencies = state.moodFrequencies)
                     }
                 }
             }

@@ -10,7 +10,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
@@ -21,7 +20,7 @@ import java.time.format.TextStyle as JavaTextStyle
 import java.util.Locale
 
 @Composable
-fun MoodHeatmapCanvas(
+fun MoodHeatmapChart(
     heatmapDays: List<HeatmapDayUiModel>,
     modifier: Modifier = Modifier
 ) {
@@ -35,9 +34,6 @@ fun MoodHeatmapCanvas(
 
     Canvas(
         modifier = modifier
-            .fillMaxWidth()
-            .height(200.dp)
-            .padding(16.dp)
     ) {
         if (heatmapDays.isEmpty()) return@Canvas
 
