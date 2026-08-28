@@ -1,4 +1,4 @@
-package com.raulastete.aura.features.player
+package com.raulastete.aura.core.features.player
 
 import kotlin.time.Duration
 

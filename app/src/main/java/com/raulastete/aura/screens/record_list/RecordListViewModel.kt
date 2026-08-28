@@ -5,9 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.raulastete.aura.R
 import com.raulastete.aura.core.designsystem.dropdowns.Selectable
-import com.raulastete.aura.features.player.AudioPlayer
-import com.raulastete.aura.features.record.RecordDataSource
-import com.raulastete.aura.features.recording.VoiceRecorder
+import com.raulastete.aura.core.features.player.AudioPlayer
+import com.raulastete.aura.core.features.record.RecordDataSource
+import com.raulastete.aura.core.features.recording.VoiceRecorder
 import com.raulastete.aura.core.presentation.model.MoodUi
 import com.raulastete.aura.core.presentation.model.PlaybackState
 import com.raulastete.aura.core.presentation.model.RecordUi
@@ -35,15 +35,15 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import kotlin.time.Duration
-import com.raulastete.aura.features.record.Record
+import com.raulastete.aura.core.features.record.Record
 import com.raulastete.aura.screens.record_list.model.AudioCaptureMethod
 import com.raulastete.aura.screens.record_list.model.RecordingState
 import kotlinx.coroutines.withContext
 
 class RecordListViewModel(
-    private val voiceRecorder: VoiceRecorder,
-    private val audioPlayer: AudioPlayer,
-    private val recordDataSource: RecordDataSource,
+    private val voiceRecorder: com.raulastete.aura.core.features.recording.VoiceRecorder,
+    private val audioPlayer: com.raulastete.aura.core.features.player.AudioPlayer,
+    private val recordDataSource: com.raulastete.aura.core.features.record.RecordDataSource,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -204,7 +204,7 @@ class RecordListViewModel(
         }
     }
 
-    private fun Flow<List<Record>>.filterByMoodAndTopics(): Flow<List<Record>> {
+    private fun Flow<List<com.raulastete.aura.core.features.record.Record>>.filterByMoodAndTopics(): Flow<List<com.raulastete.aura.core.features.record.Record>> {
         return combine(
             this,
             selectedMoodFilters,
@@ -355,7 +355,7 @@ class RecordListViewModel(
 
         val recordingDetails = voiceRecorder.recordingDetails.value
         viewModelScope.launch {
-            if (recordingDetails.duration < VoiceRecorder.MIN_RECORD_DURATION) {
+            if (recordingDetails.duration < com.raulastete.aura.core.features.recording.VoiceRecorder.MIN_RECORD_DURATION) {
                 eventChannel.send(RecordListEvent.RecordingTooShort)
             } else {
                 //Arbitrary track dimensions to not make the app crash when navigating and passing

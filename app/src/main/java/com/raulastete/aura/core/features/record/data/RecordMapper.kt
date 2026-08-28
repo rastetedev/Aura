@@ -1,16 +1,16 @@
-package com.raulastete.aura.features.record.data
+package com.raulastete.aura.core.features.record.data
 
 import com.raulastete.aura.core.database.entity.RecordEntity
 import com.raulastete.aura.core.database.entity.RecordWithTopics
 import com.raulastete.aura.core.database.entity.TopicEntity
-import com.raulastete.aura.features.record.Mood
-import com.raulastete.aura.features.record.Record
+import com.raulastete.aura.core.features.record.Mood
+import com.raulastete.aura.core.features.record.Record
 import java.time.Instant
 import kotlin.time.Duration.Companion.milliseconds
 
-fun RecordWithTopics.toRecord(): Record {
-    return Record(
-        mood = Mood.valueOf(record.mood),
+fun RecordWithTopics.toRecord(): com.raulastete.aura.core.features.record.Record {
+    return com.raulastete.aura.core.features.record.Record(
+        mood = com.raulastete.aura.core.features.record.Mood.valueOf(record.mood),
         title = record.title,
         note = record.note,
         topics = topics.map { it.topic },
@@ -22,7 +22,7 @@ fun RecordWithTopics.toRecord(): Record {
     )
 }
 
-fun Record.toEchoWithTopics(): RecordWithTopics {
+fun com.raulastete.aura.core.features.record.Record.toEchoWithTopics(): RecordWithTopics {
     return RecordWithTopics(
         record = RecordEntity(
             recordId = id ?: 0,

@@ -4,12 +4,12 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.raulastete.aura.features.player.AudioPlayer
-import com.raulastete.aura.features.record.Mood
-import com.raulastete.aura.features.record.Record
-import com.raulastete.aura.features.record.RecordDataSource
-import com.raulastete.aura.features.recording.RecordingStorage
-import com.raulastete.aura.features.settings.SettingsPreferences
+import com.raulastete.aura.core.features.player.AudioPlayer
+import com.raulastete.aura.core.features.record.Mood
+import com.raulastete.aura.core.features.record.Record
+import com.raulastete.aura.core.features.record.RecordDataSource
+import com.raulastete.aura.core.features.recording.RecordingStorage
+import com.raulastete.aura.core.features.settings.SettingsPreferences
 import com.raulastete.aura.core.presentation.model.MoodUi
 import com.raulastete.aura.core.presentation.model.PlaybackState
 import com.raulastete.aura.core.presentation.model.TrackSizeInfo
@@ -44,10 +44,10 @@ import kotlin.time.Duration.Companion.milliseconds
 
 class CreateRecordViewModel(
     private val savedStateHandle: SavedStateHandle,
-    private val recordingStorage: RecordingStorage,
-    private val audioPlayer: AudioPlayer,
-    private val recordDataSource: RecordDataSource,
-    private val settingsPreferences: SettingsPreferences
+    private val recordingStorage: com.raulastete.aura.core.features.recording.RecordingStorage,
+    private val audioPlayer: com.raulastete.aura.core.features.player.AudioPlayer,
+    private val recordDataSource: com.raulastete.aura.core.features.record.RecordDataSource,
+    private val settingsPreferences: com.raulastete.aura.core.features.settings.SettingsPreferences
 ) : ViewModel() {
 
     private var hasLoadedInitialData = false
@@ -350,9 +350,9 @@ class CreateRecordViewModel(
 
             val currentState = state.value
 
-            val record = Record(
+            val record = com.raulastete.aura.core.features.record.Record(
                 mood = currentState.form.mood?.let {
-                    Mood.valueOf(it.name)
+                    com.raulastete.aura.core.features.record.Mood.valueOf(it.name)
                 } ?: throw IllegalStateException("Mood must be set before saving record"),
                 title = currentState.form.title.trim(),
                 note = currentState.form.note.ifBlank { null },

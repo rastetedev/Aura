@@ -1,8 +1,8 @@
-package com.raulastete.aura.features.player.data
+package com.raulastete.aura.core.features.player.data
 
 import android.media.MediaPlayer
-import com.raulastete.aura.features.player.AudioPlayer
-import com.raulastete.aura.features.player.AudioTrack
+import com.raulastete.aura.core.features.player.AudioPlayer
+import com.raulastete.aura.core.features.player.AudioTrack
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay

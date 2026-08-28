@@ -1,19 +1,19 @@
-package com.raulastete.aura.features.settings.data
+package com.raulastete.aura.core.features.settings.data
 
 import android.content.Context
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.raulastete.aura.features.record.Mood
-import com.raulastete.aura.features.settings.SettingsPreferences
+import com.raulastete.aura.core.features.record.Mood
+import com.raulastete.aura.core.features.settings.SettingsPreferences
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 
 class DataStoreSettings(
     private val context: Context
-): SettingsPreferences {
+): com.raulastete.aura.core.features.settings.SettingsPreferences {
 
     companion object {
         private val Context.settingsDataStore by preferencesDataStore(
@@ -40,20 +40,20 @@ class DataStoreSettings(
             .distinctUntilChanged()
     }
 
-    override suspend fun saveDefaultMood(mood: Mood) {
+    override suspend fun saveDefaultMood(mood: com.raulastete.aura.core.features.record.Mood) {
         context.settingsDataStore.edit { prefs ->
             prefs[moodKey] = mood.name
         }
     }
 
-    override fun observeDefaultMood(): Flow<Mood> {
+    override fun observeDefaultMood(): Flow<com.raulastete.aura.core.features.record.Mood> {
         return context
             .settingsDataStore
             .data
             .map { prefs ->
                 prefs[moodKey]?.let {
-                    Mood.valueOf(it)
-                } ?: Mood.NEUTRAL
+                    com.raulastete.aura.core.features.record.Mood.valueOf(it)
+                } ?: com.raulastete.aura.core.features.record.Mood.NEUTRAL
             }
             .distinctUntilChanged()
     }

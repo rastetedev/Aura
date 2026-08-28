@@ -1,10 +1,11 @@
-package com.raulastete.aura.features.recording.data
+package com.raulastete.aura.core.features.recording.data
 
 import android.content.Context
 import android.media.MediaRecorder
 import android.os.Build
-import com.raulastete.aura.features.recording.RecordingStorage
-import com.raulastete.aura.features.recording.VoiceRecorder
+import com.raulastete.aura.core.features.recording.RecordingDetails
+import com.raulastete.aura.core.features.recording.RecordingStorage
+import com.raulastete.aura.core.features.recording.VoiceRecorder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -31,7 +32,7 @@ class AndroidVoiceRecorder(
 
     private val singleThreadDispatcher = Dispatchers.Default.limitedParallelism(1)
 
-    private val _recordingDetails = MutableStateFlow(com.raulastete.aura.features.recording.RecordingDetails())
+    private val _recordingDetails = MutableStateFlow(RecordingDetails())
     private var recorder: MediaRecorder? = null
     private var isRecording: Boolean = false
     private val amplitudes = mutableListOf<Float>()
@@ -119,7 +120,7 @@ class AndroidVoiceRecorder(
     }
 
     private fun resetSession() {
-        _recordingDetails.update { com.raulastete.aura.features.recording.RecordingDetails() }
+        _recordingDetails.update { RecordingDetails() }
         applicationScope.launch(singleThreadDispatcher) {
             amplitudes.clear()
             cleanup()

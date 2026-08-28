@@ -3,7 +3,7 @@ package com.raulastete.aura.screens.statistics
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.raulastete.aura.core.presentation.model.MoodUi
-import com.raulastete.aura.features.statistics.GetMoodStatisticsUseCase
+import com.raulastete.aura.core.features.statistics.GetMoodStatisticsUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 
 class StatisticsViewModel(
-    private val getMoodStatisticsUseCase: GetMoodStatisticsUseCase
+    private val getMoodStatisticsUseCase: com.raulastete.aura.core.features.statistics.GetMoodStatisticsUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(StatisticsUiState())

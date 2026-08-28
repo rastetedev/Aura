@@ -2,14 +2,19 @@ package com.raulastete.aura.app
 
 import androidx.room3.Room
 import com.raulastete.aura.core.database.AuraDatabase
-import com.raulastete.aura.features.player.AudioPlayer
-import com.raulastete.aura.features.player.data.AndroidAudioPlayer
-import com.raulastete.aura.features.record.data.RoomRecordDataSource
-import com.raulastete.aura.features.recording.data.InternalRecordingStorage
-import com.raulastete.aura.features.settings.data.DataStoreSettings
-import com.raulastete.aura.features.statistics.CalculateMoodFrequencyByRecords
-import com.raulastete.aura.features.statistics.CalculateMoodHeatMapByRecords
-import com.raulastete.aura.features.statistics.GetMoodStatisticsUseCase
+import com.raulastete.aura.core.features.player.AudioPlayer
+import com.raulastete.aura.core.features.player.data.AndroidAudioPlayer
+import com.raulastete.aura.core.features.record.RecordDataSource
+import com.raulastete.aura.core.features.record.data.RoomRecordDataSource
+import com.raulastete.aura.core.features.recording.RecordingStorage
+import com.raulastete.aura.core.features.recording.VoiceRecorder
+import com.raulastete.aura.core.features.recording.data.AndroidVoiceRecorder
+import com.raulastete.aura.core.features.recording.data.InternalRecordingStorage
+import com.raulastete.aura.core.features.settings.SettingsPreferences
+import com.raulastete.aura.core.features.settings.data.DataStoreSettings
+import com.raulastete.aura.core.features.statistics.CalculateMoodFrequencyByRecords
+import com.raulastete.aura.core.features.statistics.CalculateMoodHeatMapByRecords
+import com.raulastete.aura.core.features.statistics.GetMoodStatisticsUseCase
 import com.raulastete.aura.screens.create_record.CreateRecordViewModel
 import com.raulastete.aura.screens.record_list.RecordListViewModel
 import com.raulastete.aura.screens.settings.SettingsViewModel
@@ -41,16 +46,16 @@ val appModule = module {
     singleOf(::AndroidAudioPlayer) bind AudioPlayer::class
 
     single {
-        com.raulastete.aura.features.recording.data.AndroidVoiceRecorder(
+        AndroidVoiceRecorder(
             context = androidApplication(),
             applicationScope = get()
         )
-    } bind com.raulastete.aura.features.recording.VoiceRecorder::class
+    } bind VoiceRecorder::class
 
-    singleOf(::InternalRecordingStorage) bind com.raulastete.aura.features.recording.RecordingStorage::class
+    singleOf(::InternalRecordingStorage) bind RecordingStorage::class
 
-    singleOf(::RoomRecordDataSource) bind com.raulastete.aura.features.record.RecordDataSource::class
-    singleOf(::DataStoreSettings) bind com.raulastete.aura.features.settings.SettingsPreferences::class
+    singleOf(::RoomRecordDataSource) bind RecordDataSource::class
+    singleOf(::DataStoreSettings) bind SettingsPreferences::class
 
     singleOf(::GetMoodStatisticsUseCase)
     singleOf(::CalculateMoodHeatMapByRecords)

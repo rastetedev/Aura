@@ -1,6 +1,6 @@
-package com.raulastete.aura.features.settings
+package com.raulastete.aura.core.features.settings
 
-import com.raulastete.aura.features.record.Mood
+import com.raulastete.aura.core.features.record.Mood
 import kotlinx.coroutines.flow.Flow
 
 interface SettingsPreferences {

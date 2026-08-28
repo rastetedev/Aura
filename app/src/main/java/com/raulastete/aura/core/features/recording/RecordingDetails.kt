@@ -1,4 +1,4 @@
-package com.raulastete.aura.features.recording
+package com.raulastete.aura.core.features.recording
 
 import kotlin.time.Duration
 

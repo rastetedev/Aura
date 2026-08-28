@@ -1,4 +1,4 @@
-package com.raulastete.aura.features.record
+package com.raulastete.aura.core.features.record
 
 import java.time.Instant
 import kotlin.time.Duration

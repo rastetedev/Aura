@@ -1,9 +1,9 @@
 package com.raulastete.aura.features.statistics.domain
 
-import com.raulastete.aura.features.record.Mood
-import com.raulastete.aura.features.record.Record
-import com.raulastete.aura.features.record.RecordDataSource
-import com.raulastete.aura.features.statistics.GetMoodStatisticsUseCase
+import com.raulastete.aura.core.features.record.Mood
+import com.raulastete.aura.core.features.record.Record
+import com.raulastete.aura.core.features.record.RecordDataSource
+import com.raulastete.aura.core.features.statistics.GetMoodStatisticsUseCase
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.flow.flowOf
@@ -19,13 +19,16 @@ import kotlin.time.Duration.Companion.minutes
 
 class GetMoodStatisticsUseCaseTest {
 
-    private lateinit var recordDataSource: RecordDataSource
-    private lateinit var getMoodStatisticsUseCase: GetMoodStatisticsUseCase
+    private lateinit var recordDataSource: com.raulastete.aura.core.features.record.RecordDataSource
+    private lateinit var getMoodStatisticsUseCase: com.raulastete.aura.core.features.statistics.GetMoodStatisticsUseCase
 
     @Before
     fun setUp() {
         recordDataSource = mockk()
-        getMoodStatisticsUseCase = GetMoodStatisticsUseCase(recordDataSource)
+        getMoodStatisticsUseCase =
+            com.raulastete.aura.core.features.statistics.GetMoodStatisticsUseCase(
+                recordDataSource
+            )
     }
 
     @Test
@@ -35,8 +38,8 @@ class GetMoodStatisticsUseCaseTest {
         val today = LocalDate.now(zoneId)
         
         val records = listOf(
-            Record(
-                mood = Mood.EXCITED,
+            com.raulastete.aura.core.features.record.Record(
+                mood = com.raulastete.aura.core.features.record.Mood.EXCITED,
                 title = "Happy day",
                 note = null,
                 topics = emptyList(),
@@ -46,8 +49,8 @@ class GetMoodStatisticsUseCaseTest {
                 recordedAt = now,
                 id = 1
             ),
-            Record(
-                mood = Mood.SAD,
+            com.raulastete.aura.core.features.record.Record(
+                mood = com.raulastete.aura.core.features.record.Mood.SAD,
                 title = "Sad day",
                 note = null,
                 topics = emptyList(),
@@ -63,8 +66,8 @@ class GetMoodStatisticsUseCaseTest {
 
         getMoodStatisticsUseCase().collect { stats ->
             // Check frequencies
-            val excitedFreq = stats.moodFrequencies.find { it.mood == Mood.EXCITED }
-            val sadFreq = stats.moodFrequencies.find { it.mood == Mood.SAD }
+            val excitedFreq = stats.moodFrequencies.find { it.mood == com.raulastete.aura.core.features.record.Mood.EXCITED }
+            val sadFreq = stats.moodFrequencies.find { it.mood == com.raulastete.aura.core.features.record.Mood.SAD }
             
             assertEquals(1, excitedFreq?.count)
             assertEquals(1, sadFreq?.count)
@@ -75,8 +78,8 @@ class GetMoodStatisticsUseCaseTest {
             val todayHeatmap = stats.heatmapDays.find { it.date == today }
             val yesterdayHeatmap = stats.heatmapDays.find { it.date == today.minusDays(1) }
             
-            assertEquals(Mood.EXCITED, todayHeatmap?.mood)
-            assertEquals(Mood.SAD, yesterdayHeatmap?.mood)
+            assertEquals(com.raulastete.aura.core.features.record.Mood.EXCITED, todayHeatmap?.mood)
+            assertEquals(com.raulastete.aura.core.features.record.Mood.SAD, yesterdayHeatmap?.mood)
         }
     }
 }

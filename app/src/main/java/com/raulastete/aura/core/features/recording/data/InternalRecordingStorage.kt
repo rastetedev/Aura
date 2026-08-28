@@ -1,7 +1,7 @@
-package com.raulastete.aura.features.recording.data
+package com.raulastete.aura.core.features.recording.data
 
 import android.content.Context
-import com.raulastete.aura.features.recording.RecordingStorage
+import com.raulastete.aura.core.features.recording.RecordingStorage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
@@ -13,7 +13,7 @@ import java.time.temporal.ChronoUnit
 
 class InternalRecordingStorage(
     private val context: Context
-) : RecordingStorage {
+) : com.raulastete.aura.core.features.recording.RecordingStorage {
 
     override suspend fun savePersistently(tempFilePath: String): String? {
         val tempFile = File(tempFilePath)
@@ -44,7 +44,7 @@ class InternalRecordingStorage(
             context
                 .cacheDir
                 .listFiles()
-                ?.filter { it.name.startsWith(RecordingStorage.TEMP_FILE_PREFIX) }
+                ?.filter { it.name.startsWith(com.raulastete.aura.core.features.recording.RecordingStorage.TEMP_FILE_PREFIX) }
                 ?.forEach { file ->
                     file.delete()
                 }
@@ -55,7 +55,7 @@ class InternalRecordingStorage(
         val timestamp = Instant.now().truncatedTo(ChronoUnit.SECONDS).toString()
         return File(
             context.filesDir,
-            "${RecordingStorage.PERSISTENT_FILE_PREFIX}_$timestamp.${RecordingStorage.RECORDING_FILE_EXTENSION}"
+            "${com.raulastete.aura.core.features.recording.RecordingStorage.PERSISTENT_FILE_PREFIX}_$timestamp.${com.raulastete.aura.core.features.recording.RecordingStorage.RECORDING_FILE_EXTENSION}"
         )
     }
 }

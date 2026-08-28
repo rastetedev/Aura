@@ -2,9 +2,9 @@ package com.raulastete.aura.screens.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.raulastete.aura.features.record.Mood
-import com.raulastete.aura.features.record.RecordDataSource
-import com.raulastete.aura.features.settings.SettingsPreferences
+import com.raulastete.aura.core.features.record.Mood
+import com.raulastete.aura.core.features.record.RecordDataSource
+import com.raulastete.aura.core.features.settings.SettingsPreferences
 import com.raulastete.aura.core.presentation.model.MoodUi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -25,8 +25,8 @@ import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.milliseconds
 
 class SettingsViewModel(
-    private val settingsPreferences: SettingsPreferences,
-    private val recordDataSource: RecordDataSource
+    private val settingsPreferences: com.raulastete.aura.core.features.settings.SettingsPreferences,
+    private val recordDataSource: com.raulastete.aura.core.features.record.RecordDataSource
 ) : ViewModel() {
 
     private var hasLoadedInitialData = false
@@ -117,7 +117,7 @@ class SettingsViewModel(
 
     private fun onMoodClick(mood: MoodUi) {
         viewModelScope.launch {
-            settingsPreferences.saveDefaultMood(Mood.valueOf(mood.name))
+            settingsPreferences.saveDefaultMood(com.raulastete.aura.core.features.record.Mood.valueOf(mood.name))
         }
     }
 

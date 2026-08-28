@@ -37,7 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.raulastete.aura.R
-import com.raulastete.aura.features.recording.RecordingDetails
+import com.raulastete.aura.core.features.recording.RecordingDetails
 import com.raulastete.aura.core.designsystem.theme.AuraTheme
 import com.raulastete.aura.core.designsystem.theme.bgGradient
 import com.raulastete.aura.core.presentation.util.lifecycle.ObserveAsEvents
@@ -54,7 +54,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun RecordListScreen(
     viewModel: RecordListViewModel = koinViewModel(),
-    onNavigateToCreateRecord: (RecordingDetails) -> Unit,
+    onNavigateToCreateRecord: (com.raulastete.aura.core.features.recording.RecordingDetails) -> Unit,
     onNavigateToStatistics: () -> Unit,
     onNavigateToSettings: () -> Unit
 ) {
