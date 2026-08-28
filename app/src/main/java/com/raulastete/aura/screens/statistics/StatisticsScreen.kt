@@ -31,6 +31,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -47,8 +48,10 @@ fun StatisticsScreen(
     onGoBack: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
@@ -66,8 +69,10 @@ fun StatisticsScreen(
                         )
                     }
                 },
+                scrollBehavior =  scrollBehavior,
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Transparent
+                    containerColor = Color.Transparent,
+                    scrolledContainerColor = Color.Transparent
                 )
             )
         }
@@ -88,8 +93,7 @@ fun StatisticsScreen(
                     .background(MaterialTheme.colorScheme.bgGradient)
                     .verticalScroll(rememberScrollState())
                     .padding(paddingValues)
-                    .padding(horizontal = 16.dp)
-                    .padding(bottom = 16.dp),
+                    .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
 
