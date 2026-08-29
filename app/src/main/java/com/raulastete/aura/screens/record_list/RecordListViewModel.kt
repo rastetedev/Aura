@@ -35,15 +35,14 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import kotlin.time.Duration
-import com.raulastete.aura.core.features.record.Record
 import com.raulastete.aura.screens.record_list.model.AudioCaptureMethod
 import com.raulastete.aura.screens.record_list.model.RecordingState
 import kotlinx.coroutines.withContext
 
 class RecordListViewModel(
-    private val voiceRecorder: com.raulastete.aura.core.features.recording.VoiceRecorder,
-    private val audioPlayer: com.raulastete.aura.core.features.player.AudioPlayer,
-    private val recordDataSource: com.raulastete.aura.core.features.record.RecordDataSource,
+    private val voiceRecorder: VoiceRecorder,
+    private val audioPlayer: AudioPlayer,
+    private val recordDataSource: RecordDataSource,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 

@@ -12,9 +12,8 @@ import com.raulastete.aura.core.features.recording.data.AndroidVoiceRecorder
 import com.raulastete.aura.core.features.recording.data.InternalRecordingStorage
 import com.raulastete.aura.core.features.settings.SettingsPreferences
 import com.raulastete.aura.core.features.settings.data.DataStoreSettings
-import com.raulastete.aura.core.features.statistics.CalculateMoodFrequencyByRecords
-import com.raulastete.aura.core.features.statistics.CalculateMoodHeatMapByRecords
-import com.raulastete.aura.core.features.statistics.GetMoodStatisticsUseCase
+import com.raulastete.aura.core.features.statistics.CalculateMoodFrequenciesUseCase
+import com.raulastete.aura.core.features.statistics.CalculateMoodHeatMapUseCase
 import com.raulastete.aura.screens.create_record.CreateRecordViewModel
 import com.raulastete.aura.screens.record_list.RecordListViewModel
 import com.raulastete.aura.screens.settings.SettingsViewModel
@@ -57,9 +56,8 @@ val appModule = module {
     singleOf(::RoomRecordDataSource) bind RecordDataSource::class
     singleOf(::DataStoreSettings) bind SettingsPreferences::class
 
-    singleOf(::GetMoodStatisticsUseCase)
-    singleOf(::CalculateMoodHeatMapByRecords)
-    singleOf(::CalculateMoodFrequencyByRecords)
+    singleOf(::CalculateMoodHeatMapUseCase)
+    singleOf(::CalculateMoodFrequenciesUseCase)
 
     viewModelOf(::RecordListViewModel)
     viewModelOf(::CreateRecordViewModel)
