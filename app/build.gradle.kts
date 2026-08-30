@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
+    id("io.kotest").version("6.2.4")
 }
 
 android {
@@ -38,6 +39,12 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
+    }
+}
+
+android.testOptions {
+    unitTests.all {
+        it.useJUnitPlatform()
     }
 }
 
@@ -83,5 +90,10 @@ dependencies {
 
     implementation(libs.androidx.glance.appwidget)
     implementation(libs.androidx.glance.material3)
+
+    testImplementation("io.kotest:kotest-runner-junit5:6.2.4")
+    testImplementation("io.kotest:kotest-assertions-core:6.2.4")
+    testImplementation("io.kotest:kotest-property:6.2.4")
+    androidTestImplementation("io.kotest:kotest-runner-junit4:6.2.4")
 
 }

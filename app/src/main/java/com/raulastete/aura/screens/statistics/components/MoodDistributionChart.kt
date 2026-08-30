@@ -91,7 +91,7 @@ fun MoodDistributionChart(
 
                             drawRoundRect(
                                 color = mood.colorSet.vivid,
-                                size = Size(filledWidth, size.height),
+                                size = Size(filledWidth.toFloat(), size.height),
                                 cornerRadius = CornerRadius(6.dp.toPx())
                             )
                         }

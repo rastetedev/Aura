@@ -11,5 +11,5 @@ data class HeatmapDay(
 data class MoodFrequency(
     val mood: Mood,
     val count: Int,
-    val percentage: Float
+    val percentage: Double
 )
