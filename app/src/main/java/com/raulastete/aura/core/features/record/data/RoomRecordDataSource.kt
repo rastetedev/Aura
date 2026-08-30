@@ -3,8 +3,6 @@ package com.raulastete.aura.core.features.record.data
 import com.raulastete.aura.core.database.dao.RecordDao
 import com.raulastete.aura.core.features.record.Record
 import com.raulastete.aura.core.features.record.RecordDataSource
-import com.raulastete.aura.core.features.record.data.toEchoWithTopics
-import com.raulastete.aura.core.features.record.data.toRecord
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.time.Instant
@@ -12,8 +10,8 @@ import kotlin.collections.map
 
 class RoomRecordDataSource(
     private val recordDao: RecordDao
-) : com.raulastete.aura.core.features.record.RecordDataSource {
-    override fun observeRecords(): Flow<List<com.raulastete.aura.core.features.record.Record>> {
+) : RecordDataSource {
+    override fun observeRecords(): Flow<List<Record>> {
         return recordDao
             .observeRecords()
             .map { recordWithTopics ->
@@ -23,7 +21,7 @@ class RoomRecordDataSource(
             }
     }
 
-    override fun getRecordsInRange(start: Instant, end: Instant): Flow<List<com.raulastete.aura.core.features.record.Record>> {
+    override fun getRecordsInRange(start: Instant, end: Instant): Flow<List<Record>> {
         return recordDao
             .getRecordsInRange(start.toEpochMilli(), end.toEpochMilli())
             .map { recordWithTopics ->
@@ -47,7 +45,7 @@ class RoomRecordDataSource(
             }
     }
 
-    override suspend fun insertRecord(record: com.raulastete.aura.core.features.record.Record) {
+    override suspend fun insertRecord(record: Record) {
         recordDao.insertRecordWithTopics(record.toEchoWithTopics())
     }
 }

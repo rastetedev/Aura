@@ -44,10 +44,10 @@ import kotlin.time.Duration.Companion.milliseconds
 
 class CreateRecordViewModel(
     private val savedStateHandle: SavedStateHandle,
-    private val recordingStorage: com.raulastete.aura.core.features.recording.RecordingStorage,
-    private val audioPlayer: com.raulastete.aura.core.features.player.AudioPlayer,
-    private val recordDataSource: com.raulastete.aura.core.features.record.RecordDataSource,
-    private val settingsPreferences: com.raulastete.aura.core.features.settings.SettingsPreferences
+    private val recordingStorage: RecordingStorage,
+    private val audioPlayer: AudioPlayer,
+    private val recordDataSource: RecordDataSource,
+    private val settingsPreferences: SettingsPreferences
 ) : ViewModel() {
 
     private var hasLoadedInitialData = false
@@ -241,8 +241,9 @@ class CreateRecordViewModel(
                 _state.update {
                     val filteredNonDefaultResults = filteredResults - it.form.topics.toSet()
                     val searchText = it.topicPopupUiState.addTopicText.trim()
-                    val isNewTopic = searchText !in filteredNonDefaultResults && searchText !in it.form.topics
-                            && searchText.isNotBlank()
+                    val isNewTopic =
+                        searchText !in filteredNonDefaultResults && searchText !in it.form.topics
+                                && searchText.isNotBlank()
 
                     it.copy(
                         topicPopupUiState = it.topicPopupUiState.copy(
@@ -350,9 +351,9 @@ class CreateRecordViewModel(
 
             val currentState = state.value
 
-            val record = com.raulastete.aura.core.features.record.Record(
+            val record = Record(
                 mood = currentState.form.mood?.let {
-                    com.raulastete.aura.core.features.record.Mood.valueOf(it.name)
+                    Mood.valueOf(it.name)
                 } ?: throw IllegalStateException("Mood must be set before saving record"),
                 title = currentState.form.title.trim(),
                 note = currentState.form.note.ifBlank { null },
