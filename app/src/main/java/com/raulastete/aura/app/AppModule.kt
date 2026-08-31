@@ -1,6 +1,7 @@
 package com.raulastete.aura.app
 
 import androidx.room3.Room
+import com.raulastete.aura.BuildConfig
 import com.raulastete.aura.core.database.AuraDatabase
 import com.raulastete.aura.core.features.player.AudioPlayer
 import com.raulastete.aura.core.features.player.data.AndroidAudioPlayer
@@ -36,7 +37,11 @@ val appModule = module {
             androidApplication(),
             AuraDatabase::class.java,
             "aura.db",
-        ).build()
+        ).apply {
+            if (BuildConfig.DEBUG) {
+                createFromAsset("database/aura_debug.db")
+            }
+        }.build()
     }
     single {
         get<AuraDatabase>().recordDao
