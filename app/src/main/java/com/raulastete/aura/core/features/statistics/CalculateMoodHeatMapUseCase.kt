@@ -5,6 +5,7 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.temporal.TemporalAdjusters
+import kotlin.streams.asSequence
 
 class CalculateMoodHeatMapUseCase {
 
@@ -28,6 +29,7 @@ class CalculateMoodHeatMapUseCase {
             .map { date ->
                 HeatmapDay(date, latestMoodByDay[date])
             }
+            .asSequence()
             .toList()
     }
 }
