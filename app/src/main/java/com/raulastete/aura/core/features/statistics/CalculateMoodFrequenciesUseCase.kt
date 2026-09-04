@@ -6,22 +6,47 @@ import com.raulastete.aura.core.features.record.Record
 class CalculateMoodFrequenciesUseCase {
 
     operator fun invoke(records: List<Record>): List<MoodFrequency> {
-        if (records.isEmpty()) return Mood.entries.map { MoodFrequency(it, 0, 0.0) }
-
         val totalRecords = records.size
-        val countsByMood = records.groupingBy { it.mood }.eachCount()
-        var accumulativePercentage = 0.0
+        val moods = Mood.entries
+        if (totalRecords == 0) return moods.map { MoodFrequency.zeroPercentage(it) }
 
-        return Mood.entries.mapIndexed { index, mood ->
-            val count = countsByMood[mood] ?: 0
-            if (index == Mood.entries.lastIndex) {
-                MoodFrequency(mood, count, 1.0 - accumulativePercentage)
-            } else {
-                val percentage = (count / totalRecords.toDouble() * 10) / 10
-                accumulativePercentage += percentage
-                println("Percentage $percentage")
-                MoodFrequency(mood, count, percentage)
-            }
+        val moodCounts = IntArray(moods.size)
+        for (record in records) {
+            moodCounts[record.mood.ordinal]++
         }
+
+        val items = List(moods.size) { index ->
+            val mood = moods[index]
+            val count = moodCounts[index]
+            MoodInfo(
+                mood = mood,
+                count = count,
+                percentage = (count * 100) / totalRecords,
+                remainder = (count * 100) % totalRecords
+            )
+        }
+
+        var currentSum = 0
+        for (item in items) {
+            currentSum += item.percentage
+        }
+
+        val diff = 100 - currentSum
+        if (diff > 0) {
+            items.sortedWith(
+                compareByDescending { it.remainder }
+            )
+                .take(diff)
+                .forEach { it.percentage++ }
+        }
+
+        return items.map { MoodFrequency(it.mood, it.count, it.percentage) }
     }
 }
+
+private class MoodInfo(
+    val mood: Mood,
+    val count: Int,
+    var percentage: Int,
+    val remainder: Int
+)

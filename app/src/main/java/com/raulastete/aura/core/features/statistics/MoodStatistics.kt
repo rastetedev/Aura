@@ -11,5 +11,9 @@ data class HeatmapDay(
 data class MoodFrequency(
     val mood: Mood,
     val count: Int,
-    val percentage: Double
-)
+    val percentage: Int
+) {
+    companion object {
+        fun zeroPercentage(mood: Mood) = MoodFrequency(mood, 0, 0)
+    }
+}

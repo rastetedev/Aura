@@ -20,9 +20,7 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.raulastete.aura.screens.statistics.MoodFrequencyUiModel
 
 @Composable
@@ -69,7 +67,7 @@ fun MoodDistributionChart(
 
                             Text(
                                 modifier = Modifier.wrapContentWidth(),
-                                text = "${(moodFrequency.percentage * 100).toInt()}%",
+                                text = "${moodFrequency.percentage}%",
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = mood.colorSet.vivid
                             )
@@ -81,7 +79,7 @@ fun MoodDistributionChart(
                                 .height(12.dp)
                         ) {
                             val barWidth = size.width
-                            val filledWidth = barWidth * percentage
+                            val filledWidth = barWidth * percentage / 100
 
                             drawRoundRect(
                                 color = surfaceVariant,
@@ -91,7 +89,7 @@ fun MoodDistributionChart(
 
                             drawRoundRect(
                                 color = mood.colorSet.vivid,
-                                size = Size(filledWidth.toFloat(), size.height),
+                                size = Size(filledWidth, size.height),
                                 cornerRadius = CornerRadius(6.dp.toPx())
                             )
                         }

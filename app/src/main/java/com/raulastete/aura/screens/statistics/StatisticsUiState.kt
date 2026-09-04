@@ -16,6 +16,6 @@ data class HeatmapDayUiModel(
 
 data class MoodFrequencyUiModel(
     val mood: MoodUi,
-    val percentage: Double
+    val percentage: Int
 )
 
