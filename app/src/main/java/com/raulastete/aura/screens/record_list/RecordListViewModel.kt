@@ -451,10 +451,17 @@ class RecordListViewModel(
         return when (size) {
             0 -> UiText.StringResource(R.string.all_topics)
             1 -> UiText.Dynamic(this.first())
-            2 -> UiText.Dynamic("${this.first()}, ${this.last()}")
+            2 -> UiText.StringResource(
+                R.string.topics_selected_max,
+                arrayOf(this.first(), this.last())
+            )
+
             else -> {
                 val extraElementCount = size - 2
-                UiText.Dynamic("${this.first()}, ${this[1]} +$extraElementCount")
+                UiText.StringResource(
+                    R.string.topics_selected_overflow,
+                    arrayOf(this.first(), this[1], extraElementCount)
+                )
             }
         }
     }
