@@ -90,6 +90,43 @@
     <string name="my_topics">My Topics</string>
     <string name="select_default_topics_to_apply_to_all_new_entries">Select default topics to apply to all new entries</string>
 
+    <!-- SETTINGS: Data Backup Card -->
+    <string name="backup_card_title">Data Backup</string>
+    <string name="backup_card_description">Export your entries and audio recordings as a ZIP file, or restore from a previous backup.</string>
+    <string name="backup_export">Export</string>
+    <string name="backup_import">Import</string>
+    <string name="backup_exporting">Exporting…</string>
+    <string name="backup_importing">Importing…</string>
+    <string name="backup_export_in_progress_hint">Your backup is being created in the background. You\'ll be notified when it\'s ready.</string>
+    <string name="backup_import_in_progress_hint">Your backup is being restored in the background. You\'ll be notified when it\'s done.</string>
+
+    <!-- BACKUP: Notification channel -->
+    <string name="backup_notification_channel_name">Backup &amp; Restore</string>
+    <string name="backup_notification_channel_description">Progress updates for data export and import operations</string>
+
+    <!-- BACKUP: Notification progress -->
+    <string name="backup_progress_preparing">Preparing…</string>
+    <string name="backup_progress_percent">%1$d%%</string>
+
+    <!-- BACKUP: Export notifications -->
+    <string name="export_notification_title">Exporting your data…</string>
+    <string name="export_success_title">Export complete</string>
+    <string name="export_success_message">Your backup is ready to share.</string>
+    <string name="export_error_title">Export failed</string>
+    <string name="export_error_message">Something went wrong while exporting. Please try again.</string>
+    <string name="export_share_title">Share your Aura backup</string>
+    <string name="export_toast_success">Backup exported successfully!</string>
+    <string name="export_toast_error">Export failed. Please try again.</string>
+
+    <!-- BACKUP: Import notifications -->
+    <string name="import_notification_title">Importing your data…</string>
+    <string name="import_success_title">Import complete</string>
+    <string name="import_success_message">Your entries have been restored.</string>
+    <string name="import_error_title">Import failed</string>
+    <string name="import_error_message">Something went wrong while importing. Please check the file and try again.</string>
+    <string name="import_toast_success">Backup restored successfully!</string>
+    <string name="import_toast_error">Import failed. Please check the file and try again.</string>
+
     <!-- SCREEN: Widget -->
     <string name="widget_title">New Entry Widget</string>
     <string name="widget_description">Create a new journal entry</string>

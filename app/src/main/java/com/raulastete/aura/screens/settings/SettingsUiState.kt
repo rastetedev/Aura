@@ -9,5 +9,9 @@ data class SettingsUiState(
     val suggestedTopics: List<String> = emptyList(),
     val isTopicSuggestionsVisible: Boolean = false,
     val showCreateTopicOption: Boolean = false,
-    val isTopicTextInputVisible: Boolean = false
+    val isTopicTextInputVisible: Boolean = false,
+
+    // Backup
+    val isExporting: Boolean = false,
+    val isImporting: Boolean = false,
 )

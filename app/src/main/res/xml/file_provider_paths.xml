@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!--
+        Covers context.getExternalFilesDir(null)/backups/
+        where export ZIPs are written. This directory is on external storage
+        but is app-private (no READ_EXTERNAL_STORAGE required to write here).
+        FileProvider makes files in this tree sharable via content:// URIs.
+    -->
+    <external-files-path
+        name="aura_backups"
+        path="backups/" />
+
+    <!--
+        Covers context.filesDir for internal audio files if ever needed
+        for sharing individual recordings.
+    -->
+    <files-path
+        name="aura_internal"
+        path="." />
+</paths>

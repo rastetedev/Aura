@@ -1,5 +1,6 @@
 package com.raulastete.aura.screens.settings
 
+import android.net.Uri
 import com.raulastete.aura.core.presentation.model.MoodUi
 
 sealed interface SettingsAction {
@@ -11,4 +12,8 @@ sealed interface SettingsAction {
     data object OnAddButtonClick: SettingsAction
     object OnRemoveFocusOnInputText : SettingsAction
     data class OnMoodClick(val mood: MoodUi): SettingsAction
+
+    // Backup
+    data object OnExportClick : SettingsAction
+    data class OnImportFileSelected(val uri: Uri) : SettingsAction
 }

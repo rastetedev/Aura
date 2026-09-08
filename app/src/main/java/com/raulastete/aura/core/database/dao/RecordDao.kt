@@ -17,11 +17,18 @@ interface RecordDao {
     @Query("SELECT * FROM RecordEntity ORDER BY recordedAt DESC")
     fun observeRecords(): Flow<List<RecordWithTopics>>
 
+    @Transaction
+    @Query("SELECT * FROM RecordEntity ORDER BY recordedAt DESC")
+    suspend fun getAllRecords(): List<RecordWithTopics>
+
     @Query("SELECT * FROM TopicEntity ORDER BY topic ASC")
+    suspend fun getAllTopics(): List<TopicEntity>
+
+    @Query("SELECT DISTINCT * FROM TopicEntity ORDER BY topic ASC")
     fun observeTopics(): Flow<List<TopicEntity>>
 
     @Query("""
-        SELECT *
+        SELECT DISTINCT *
         FROM TopicEntity
         WHERE topic LIKE "%" || :query || "%"
         ORDER BY topic ASC
@@ -54,6 +61,9 @@ interface RecordDao {
     @Upsert
     suspend fun upsertTopic(topicEntity: TopicEntity)
 
+    @Insert(onConflict = androidx.room3.OnConflictStrategy.REPLACE)
+    suspend fun upsertRecord(recordEntity: RecordEntity): Long
+
     @Insert
     suspend fun insertRecordTopicCrossRef(crossRef: RecordTopicCrossRef)
 
@@ -70,5 +80,22 @@ interface RecordDao {
                 )
             )
         }
+    }
+
+    @Query("DELETE FROM RecordEntity")
+    suspend fun deleteAllRecords()
+
+    @Query("DELETE FROM TopicEntity")
+    suspend fun deleteAllTopics()
+
+    @Query("DELETE FROM RecordTopicCrossRef")
+    suspend fun deleteAllCrossRefs()
+
+    @Transaction
+    suspend fun replaceAllData(records: List<RecordWithTopics>) {
+        deleteAllCrossRefs()
+        deleteAllRecords()
+        deleteAllTopics()
+        records.forEach { insertRecordWithTopics(it) }
     }
 }

@@ -1,7 +1,10 @@
 package com.raulastete.aura.app
 
 import android.app.Application
+import androidx.work.Configuration
+import androidx.work.WorkManager
 import com.raulastete.aura.BuildConfig
+import com.raulastete.aura.core.workers.AuraWorkerFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -16,7 +19,7 @@ class AuraApp : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        if(BuildConfig.DEBUG){
+        if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
         }
 
@@ -24,5 +27,13 @@ class AuraApp : Application() {
             androidContext(this@AuraApp)
             modules(appModule)
         }
+
+        // Initialize WorkManager with our custom factory so Workers can use KoinComponent
+        WorkManager.initialize(
+            this,
+            Configuration.Builder()
+                .setWorkerFactory(AuraWorkerFactory())
+                .build()
+        )
     }
 }

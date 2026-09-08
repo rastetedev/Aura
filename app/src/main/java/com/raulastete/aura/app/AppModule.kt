@@ -1,6 +1,7 @@
 package com.raulastete.aura.app
 
 import androidx.room3.Room
+import androidx.work.WorkManager
 import com.raulastete.aura.BuildConfig
 import com.raulastete.aura.core.database.AuraDatabase
 import com.raulastete.aura.core.features.player.AudioPlayer
@@ -28,7 +29,7 @@ import org.koin.dsl.module
 
 val appModule = module {
 
-    single<CoroutineScope>{
+    single<CoroutineScope> {
         (androidApplication() as AuraApp).applicationScope
     }
 
@@ -43,8 +44,13 @@ val appModule = module {
             }
         }.build()
     }
+
     single {
         get<AuraDatabase>().recordDao
+    }
+
+    single<WorkManager> {
+        WorkManager.getInstance(androidApplication())
     }
 
     singleOf(::AndroidAudioPlayer) bind AudioPlayer::class

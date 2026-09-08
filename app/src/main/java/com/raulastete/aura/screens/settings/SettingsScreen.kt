@@ -1,12 +1,18 @@
 package com.raulastete.aura.screens.settings
 
+import android.Manifest
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -32,6 +38,7 @@ import com.raulastete.aura.R
 import com.raulastete.aura.core.designsystem.modifier.defaultShadow
 import com.raulastete.aura.core.designsystem.theme.AuraTheme
 import com.raulastete.aura.core.designsystem.theme.bgGradient
+import com.raulastete.aura.screens.settings.components.DataBackupCard
 import com.raulastete.aura.screens.settings.components.DefaultTopicSelectorCard
 import com.raulastete.aura.screens.settings.components.MoodCard
 import org.koin.androidx.compose.koinViewModel
@@ -62,6 +69,18 @@ fun SettingsContent(
     onAction: (SettingsAction) -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
+
+    // File picker for ZIP import
+    val importFileLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri ->
+        uri?.let { onAction(SettingsAction.OnImportFileSelected(it)) }
+    }
+
+    // Notification permission launcher (Android 13+)
+    val notificationPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { /* permission result handled silently; worker shows toast regardless */ }
 
     Scaffold(
         topBar = {
@@ -94,9 +113,7 @@ fun SettingsContent(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(
-                    brush = MaterialTheme.colorScheme.bgGradient
-                )
+                .background(brush = MaterialTheme.colorScheme.bgGradient)
                 .pointerInput(Unit) {
                     detectTapGestures(
                         onTap = {
@@ -106,14 +123,14 @@ fun SettingsContent(
                     )
                 }
                 .padding(innerPadding)
-                .padding(16.dp),
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             MoodCard(
                 selectedMood = state.selectedMood,
                 onMoodClick = { onAction(SettingsAction.OnMoodClick(it)) },
-                modifier = Modifier
-                    .defaultShadow(shape = RoundedCornerShape(8.dp))
+                modifier = Modifier.defaultShadow(shape = RoundedCornerShape(8.dp))
             )
 
             DefaultTopicSelectorCard(
@@ -123,23 +140,31 @@ fun SettingsContent(
                 showCreateTopicOption = state.showCreateTopicOption,
                 showSuggestionsDropDown = state.isTopicSuggestionsVisible,
                 canInputText = state.isTopicTextInputVisible,
-                onSearchTextChange = {
-                    onAction(SettingsAction.OnSearchTextChange(it))
+                onSearchTextChange = { onAction(SettingsAction.OnSearchTextChange(it)) },
+                onToggleCanInputText = { onAction(SettingsAction.OnAddButtonClick) },
+                onAddTopicClick = { onAction(SettingsAction.OnSelectTopicClick(it)) },
+                onRemoveTopicClick = { onAction(SettingsAction.OnRemoveTopicClick(it)) },
+                onDismissSuggestionsDropDown = { onAction(SettingsAction.OnDismissTopicDropDown) },
+                modifier = Modifier.defaultShadow(shape = RoundedCornerShape(8.dp))
+            )
+
+            DataBackupCard(
+                isExporting = state.isExporting,
+                isImporting = state.isImporting,
+                onExportClick = {
+                    // Request notification permission on Android 13+ before starting work
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    }
+                    onAction(SettingsAction.OnExportClick)
                 },
-                onToggleCanInputText = {
-                    onAction(SettingsAction.OnAddButtonClick)
+                onImportClick = {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    }
+                    importFileLauncher.launch("application/zip")
                 },
-                onAddTopicClick = {
-                    onAction(SettingsAction.OnSelectTopicClick(it))
-                },
-                onRemoveTopicClick = {
-                    onAction(SettingsAction.OnRemoveTopicClick(it))
-                },
-                onDismissSuggestionsDropDown = {
-                    onAction(SettingsAction.OnDismissTopicDropDown)
-                },
-                modifier = Modifier
-                    .defaultShadow(shape = RoundedCornerShape(8.dp))
+                modifier = Modifier.defaultShadow(shape = RoundedCornerShape(8.dp))
             )
         }
     }

@@ -10,6 +10,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -19,7 +20,6 @@ import com.raulastete.aura.core.presentation.model.RecordUi
 import com.raulastete.aura.core.presentation.model.TrackSizeInfo
 import com.raulastete.aura.core.presentation.util.string.UiText
 import com.raulastete.aura.screens.record_list.model.RecordDaySection
-import kotlin.collections.forEachIndexed
 import kotlin.random.Random
 
 @Composable
@@ -30,10 +30,11 @@ fun RecordList(
     onTrackSizeAvailable: (trackSizeInfo: TrackSizeInfo) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
 
     LazyColumn(modifier = modifier) {
-        recordSections.forEachIndexed { sectionIndex, (dateHeader, records) ->
-            stickyHeader(key = sectionIndex) {
+        recordSections.forEach { (dateHeader, records) ->
+            stickyHeader(key = "header_${dateHeader.asString(context)}") {
                 Text(
                     text = dateHeader.asString().uppercase(),
                     style = MaterialTheme.typography.labelMedium.copy(
