@@ -16,12 +16,15 @@ import com.raulastete.aura.core.presentation.model.toRecordUi
 import com.raulastete.aura.core.presentation.util.amplitude.AmplitudeNormalizer
 import com.raulastete.aura.core.presentation.util.string.UiText
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChangedBy
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -32,6 +35,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.LocalTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import kotlin.time.Duration
@@ -39,6 +43,7 @@ import com.raulastete.aura.screens.record_list.model.AudioCaptureMethod
 import com.raulastete.aura.screens.record_list.model.RecordingState
 import kotlinx.coroutines.withContext
 
+@OptIn(FlowPreview::class, kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 class RecordListViewModel(
     private val voiceRecorder: VoiceRecorder,
     private val audioPlayer: AudioPlayer,
@@ -52,6 +57,8 @@ class RecordListViewModel(
     private val selectedMoodFilters = MutableStateFlow<List<MoodUi>>(emptyList())
     private val selectedTopicFilters = MutableStateFlow<List<String>>(emptyList())
     private val audioTrackSizeInfo = MutableStateFlow<TrackSizeInfo?>(null)
+    private val searchQuery = MutableStateFlow("")
+    private val dateRange = MutableStateFlow<Pair<LocalDate, LocalDate>?>(null)
 
     private val _state = MutableStateFlow(RecordListUiState())
     val state = _state
@@ -72,8 +79,29 @@ class RecordListViewModel(
     private val eventChannel = Channel<RecordListEvent>()
     val events = eventChannel.receiveAsFlow()
 
-    private val filteredRecords = recordDataSource
-        .observeRecords()
+    // Cada cambio en query o dateRange produce un nuevo Flow de la DB (flatMapLatest cancela el anterior)
+    private val dbRecords = combine(
+        searchQuery.debounce(300),
+        dateRange
+    ) { query, range -> query to range }
+        .flatMapLatest { (query, range) ->
+            when {
+                query.isNotBlank() && range != null -> {
+                    val startInstant = range.first.atStartOfDay(ZoneId.systemDefault()).toInstant()
+                    val endInstant = range.second.atTime(LocalTime.MAX).atZone(ZoneId.systemDefault()).toInstant()
+                    recordDataSource.searchRecordsInRange(query, startInstant, endInstant)
+                }
+                query.isNotBlank() -> recordDataSource.searchRecords(query)
+                range != null -> {
+                    val startInstant = range.first.atStartOfDay(ZoneId.systemDefault()).toInstant()
+                    val endInstant = range.second.atTime(LocalTime.MAX).atZone(ZoneId.systemDefault()).toInstant()
+                    recordDataSource.getRecordsInRange(startInstant, endInstant)
+                }
+                else -> recordDataSource.observeRecords()
+            }
+        }
+
+    private val filteredRecords = dbRecords
         .filterByMoodAndTopics()
         .onEach {
             _state.update {
@@ -132,6 +160,31 @@ class RecordListViewModel(
             RecordListAction.OnCompleteRecording -> stopRecording()
             RecordListAction.OnPauseRecordingClick -> pauseRecording()
             RecordListAction.OnResumeRecordingClick -> resumeRecording()
+
+            is RecordListAction.OnSearchQueryChange -> {
+                searchQuery.update { action.query }
+                _state.update { it.copy(searchQuery = action.query) }
+            }
+
+            is RecordListAction.OnDateRangeSelected -> {
+                dateRange.update { action.startDate to action.endDate }
+                _state.update {
+                    it.copy(
+                        dateRangeStart = action.startDate,
+                        dateRangeEnd = action.endDate
+                    )
+                }
+            }
+
+            RecordListAction.OnClearDateRange -> {
+                dateRange.update { null }
+                _state.update {
+                    it.copy(
+                        dateRangeStart = null,
+                        dateRangeEnd = null
+                    )
+                }
+            }
         }
     }
 
@@ -357,8 +410,6 @@ class RecordListViewModel(
             if (recordingDetails.duration < com.raulastete.aura.core.features.recording.VoiceRecorder.MIN_RECORD_DURATION) {
                 eventChannel.send(RecordListEvent.RecordingTooShort)
             } else {
-                //Arbitrary track dimensions to not make the app crash when navigating and passing
-                //the amplitudes as an argument
                 val normalizedAmplitudes = withContext(Dispatchers.Default) {
                     AmplitudeNormalizer.normalize(
                         sourceAmplitudes = recordingDetails.amplitudes,

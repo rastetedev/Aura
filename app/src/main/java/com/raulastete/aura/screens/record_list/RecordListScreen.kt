@@ -48,6 +48,7 @@ import com.raulastete.aura.screens.record_list.components.NoRecordsView
 import com.raulastete.aura.screens.record_list.components.QuickRecordFabButton
 import com.raulastete.aura.screens.record_list.components.RecordList
 import com.raulastete.aura.screens.record_list.components.RecordingSheet
+import com.raulastete.aura.screens.record_list.components.SearchAndDateFilterBar
 import com.raulastete.aura.screens.record_list.model.AudioCaptureMethod
 import com.raulastete.aura.screens.record_list.model.RecordingState
 import org.koin.androidx.compose.koinViewModel
@@ -200,6 +201,17 @@ private fun RecordListContent(
 
                 state.hasRecords.not() -> {
                     Column(Modifier.fillMaxWidth()) {
+                        SearchAndDateFilterBar(
+                            searchQuery = state.searchQuery,
+                            isDateRangeActive = state.isDateRangeFilterActive,
+                            dateRangeStart = state.dateRangeStart,
+                            dateRangeEnd = state.dateRangeEnd,
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            onAction = onAction,
+                        )
+
+                        Spacer(Modifier.height(8.dp))
+
                         FiltersSection(
                             modifier = Modifier.padding(horizontal = 16.dp),
                             moods = state.moodFilterList,
@@ -222,6 +234,17 @@ private fun RecordListContent(
 
                 else -> {
                     Column(Modifier.fillMaxWidth()) {
+                        SearchAndDateFilterBar(
+                            searchQuery = state.searchQuery,
+                            isDateRangeActive = state.isDateRangeFilterActive,
+                            dateRangeStart = state.dateRangeStart,
+                            dateRangeEnd = state.dateRangeEnd,
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            onAction = onAction,
+                        )
+
+                        Spacer(Modifier.height(8.dp))
+
                         FiltersSection(
                             modifier = Modifier.padding(horizontal = 16.dp),
                             moods = state.moodFilterList,

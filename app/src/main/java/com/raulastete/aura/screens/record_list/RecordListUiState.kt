@@ -8,6 +8,7 @@ import com.raulastete.aura.core.presentation.util.string.UiText
 import com.raulastete.aura.screens.record_list.model.AudioCaptureMethod
 import com.raulastete.aura.screens.record_list.model.RecordDaySection
 import com.raulastete.aura.screens.record_list.model.RecordingState
+import java.time.LocalDate
 import java.util.Locale
 import kotlin.math.roundToInt
 import kotlin.time.Duration
@@ -22,10 +23,14 @@ data class RecordListUiState(
     val topicFilterList: List<Selectable<String>> = emptyList(),
     val moodChipContent: MoodChipContent = MoodChipContent(),
     val topicChipContent: UiText = UiText.StringResource(R.string.all_topics),
+    val searchQuery: String = "",
+    val dateRangeStart: LocalDate? = null,
+    val dateRangeEnd: LocalDate? = null,
 ) {
     val hasRecords: Boolean = records.isNotEmpty()
     val isMoodFilterActive = moodFilterList.any { it.selected }
     val isTopicFilterActive = topicFilterList.any { it.selected }
+    val isDateRangeFilterActive = dateRangeStart != null && dateRangeEnd != null
     val recordSections = records.map { (dateHeader, records) ->
         RecordDaySection(
             dateHeader,

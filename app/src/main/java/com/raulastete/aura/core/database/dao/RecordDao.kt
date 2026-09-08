@@ -28,6 +28,23 @@ interface RecordDao {
     """)
     fun searchTopics(query: String): Flow<List<TopicEntity>>
 
+    @Transaction
+    @Query("""
+        SELECT * FROM RecordEntity
+        WHERE (LOWER(title) LIKE "%" || LOWER(:query) || "%" OR LOWER(note) LIKE "%" || LOWER(:query) || "%")
+        ORDER BY recordedAt DESC
+    """)
+    fun searchRecords(query: String): Flow<List<RecordWithTopics>>
+
+    @Transaction
+    @Query("""
+        SELECT * FROM RecordEntity
+        WHERE recordedAt BETWEEN :start AND :end
+        AND (LOWER(title) LIKE "%" || LOWER(:query) || "%" OR LOWER(note) LIKE "%" || LOWER(:query) || "%")
+        ORDER BY recordedAt DESC
+    """)
+    fun searchRecordsInRange(query: String, start: Long, end: Long): Flow<List<RecordWithTopics>>
+
     @Insert
     suspend fun insertRecord(recordEntity: RecordEntity): Long
 

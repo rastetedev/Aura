@@ -29,6 +29,22 @@ class RoomRecordDataSource(
             }
     }
 
+    override fun searchRecords(query: String): Flow<List<Record>> {
+        return recordDao
+            .searchRecords(query)
+            .map { recordWithTopics ->
+                recordWithTopics.map { it.toRecord() }
+            }
+    }
+
+    override fun searchRecordsInRange(query: String, start: Instant, end: Instant): Flow<List<Record>> {
+        return recordDao
+            .searchRecordsInRange(query, start.toEpochMilli(), end.toEpochMilli())
+            .map { recordWithTopics ->
+                recordWithTopics.map { it.toRecord() }
+            }
+    }
+
     override fun observeTopics(): Flow<List<String>> {
         return recordDao
             .observeTopics()
