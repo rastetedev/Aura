@@ -93,9 +93,9 @@ dependencies {
     implementation(libs.androidx.glance.appwidget)
     implementation(libs.androidx.glance.material3)
 
-    testImplementation("io.kotest:kotest-runner-junit5:6.2.4")
-    testImplementation("io.kotest:kotest-assertions-core:6.2.4")
-    testImplementation("io.kotest:kotest-property:6.2.4")
-    androidTestImplementation("io.kotest:kotest-runner-junit4:6.2.4")
+    testImplementation(libs.kotest.runner.junit5)
+    testImplementation(libs.kotest.assertions.core)
+    testImplementation(libs.kotest.property)
+    androidTestImplementation(libs.kotest.runner.junit4)
 
 }
